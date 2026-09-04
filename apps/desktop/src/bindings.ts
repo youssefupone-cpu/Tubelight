@@ -212,3 +212,11 @@ export function unlike(_video_id: string): Promise<void> {
 export function watch_later(_video: VideoSummary): Promise<void> {
   return Promise.resolve();
 }
+
+export function export_account(_dest: string): Promise<void> {
+  return Promise.resolve();
+}
+
+export function import_account(_src: string): Promise<void> {
+  return Promise.resolve();
+}

@@ -10,18 +10,34 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as LibraryRouteImport } from './routes/library'
 import { Route as ResultsRouteImport } from './routes/results'
+import { Route as UsersRouteImport } from './routes/users'
 import { Route as WatchRouteImport } from './routes/watch'
 import { Route as ChannelIdRouteImport } from './routes/channel.$id'
+import { Route as FeedHistoryRouteImport } from './routes/feed.history'
+import { Route as FeedLikedRouteImport } from './routes/feed.liked'
+import { Route as FeedSubscriptionsRouteImport } from './routes/feed.subscriptions'
+import { Route as FeedWatchLaterRouteImport } from './routes/feed.watch-later'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LibraryRoute = LibraryRouteImport.update({
+  id: '/library',
+  path: '/library',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResultsRoute = ResultsRouteImport.update({
   id: '/results',
   path: '/results',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UsersRoute = UsersRouteImport.update({
+  id: '/users',
+  path: '/users',
   getParentRoute: () => rootRouteImport,
 } as any)
 const WatchRoute = WatchRouteImport.update({
@@ -34,39 +50,114 @@ const ChannelIdRoute = ChannelIdRouteImport.update({
   path: '/channel/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FeedHistoryRoute = FeedHistoryRouteImport.update({
+  id: '/feed/history',
+  path: '/feed/history',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FeedLikedRoute = FeedLikedRouteImport.update({
+  id: '/feed/liked',
+  path: '/feed/liked',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FeedSubscriptionsRoute = FeedSubscriptionsRouteImport.update({
+  id: '/feed/subscriptions',
+  path: '/feed/subscriptions',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FeedWatchLaterRoute = FeedWatchLaterRouteImport.update({
+  id: '/feed/watch-later',
+  path: '/feed/watch-later',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/library': typeof LibraryRoute
   '/results': typeof ResultsRoute
+  '/users': typeof UsersRoute
   '/watch': typeof WatchRoute
   '/channel/$id': typeof ChannelIdRoute
+  '/feed/history': typeof FeedHistoryRoute
+  '/feed/liked': typeof FeedLikedRoute
+  '/feed/subscriptions': typeof FeedSubscriptionsRoute
+  '/feed/watch-later': typeof FeedWatchLaterRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/library': typeof LibraryRoute
   '/results': typeof ResultsRoute
+  '/users': typeof UsersRoute
   '/watch': typeof WatchRoute
   '/channel/$id': typeof ChannelIdRoute
+  '/feed/history': typeof FeedHistoryRoute
+  '/feed/liked': typeof FeedLikedRoute
+  '/feed/subscriptions': typeof FeedSubscriptionsRoute
+  '/feed/watch-later': typeof FeedWatchLaterRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/library': typeof LibraryRoute
   '/results': typeof ResultsRoute
+  '/users': typeof UsersRoute
   '/watch': typeof WatchRoute
   '/channel/$id': typeof ChannelIdRoute
+  '/feed/history': typeof FeedHistoryRoute
+  '/feed/liked': typeof FeedLikedRoute
+  '/feed/subscriptions': typeof FeedSubscriptionsRoute
+  '/feed/watch-later': typeof FeedWatchLaterRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/results' | '/watch' | '/channel/$id'
+  fullPaths:
+    | '/'
+    | '/library'
+    | '/results'
+    | '/users'
+    | '/watch'
+    | '/channel/$id'
+    | '/feed/history'
+    | '/feed/liked'
+    | '/feed/subscriptions'
+    | '/feed/watch-later'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/results' | '/watch' | '/channel/$id'
-  id: '__root__' | '/' | '/results' | '/watch' | '/channel/$id'
+  to:
+    | '/'
+    | '/library'
+    | '/results'
+    | '/users'
+    | '/watch'
+    | '/channel/$id'
+    | '/feed/history'
+    | '/feed/liked'
+    | '/feed/subscriptions'
+    | '/feed/watch-later'
+  id:
+    | '__root__'
+    | '/'
+    | '/library'
+    | '/results'
+    | '/users'
+    | '/watch'
+    | '/channel/$id'
+    | '/feed/history'
+    | '/feed/liked'
+    | '/feed/subscriptions'
+    | '/feed/watch-later'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  LibraryRoute: typeof LibraryRoute
   ResultsRoute: typeof ResultsRoute
+  UsersRoute: typeof UsersRoute
   WatchRoute: typeof WatchRoute
   ChannelIdRoute: typeof ChannelIdRoute
+  FeedHistoryRoute: typeof FeedHistoryRoute
+  FeedLikedRoute: typeof FeedLikedRoute
+  FeedSubscriptionsRoute: typeof FeedSubscriptionsRoute
+  FeedWatchLaterRoute: typeof FeedWatchLaterRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -78,11 +169,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/library': {
+      id: '/library'
+      path: '/library'
+      fullPath: '/library'
+      preLoaderRoute: typeof LibraryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/results': {
       id: '/results'
       path: '/results'
       fullPath: '/results'
       preLoaderRoute: typeof ResultsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/users': {
+      id: '/users'
+      path: '/users'
+      fullPath: '/users'
+      preLoaderRoute: typeof UsersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/watch': {
@@ -99,14 +204,48 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ChannelIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/feed/history': {
+      id: '/feed/history'
+      path: '/feed/history'
+      fullPath: '/feed/history'
+      preLoaderRoute: typeof FeedHistoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/feed/liked': {
+      id: '/feed/liked'
+      path: '/feed/liked'
+      fullPath: '/feed/liked'
+      preLoaderRoute: typeof FeedLikedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/feed/subscriptions': {
+      id: '/feed/subscriptions'
+      path: '/feed/subscriptions'
+      fullPath: '/feed/subscriptions'
+      preLoaderRoute: typeof FeedSubscriptionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/feed/watch-later': {
+      id: '/feed/watch-later'
+      path: '/feed/watch-later'
+      fullPath: '/feed/watch-later'
+      preLoaderRoute: typeof FeedWatchLaterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  LibraryRoute: LibraryRoute,
   ResultsRoute: ResultsRoute,
+  UsersRoute: UsersRoute,
   WatchRoute: WatchRoute,
   ChannelIdRoute: ChannelIdRoute,
+  FeedHistoryRoute: FeedHistoryRoute,
+  FeedLikedRoute: FeedLikedRoute,
+  FeedSubscriptionsRoute: FeedSubscriptionsRoute,
+  FeedWatchLaterRoute: FeedWatchLaterRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

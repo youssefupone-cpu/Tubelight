@@ -7,6 +7,16 @@ export const Route = createRootRoute({
 				<Link to="/" className="font-semibold">
 					yoube
 				</Link>
+				<Link
+					to="/library"
+					search={{ tab: "subscriptions" }}
+					className="text-sm text-neutral-400 hover:text-white"
+				>
+					Library
+				</Link>
+				<Link to="/users" className="text-sm text-neutral-400 hover:text-white">
+					Users
+				</Link>
 			</header>
 			<main className="flex-1 min-h-0">
 				<Outlet />
