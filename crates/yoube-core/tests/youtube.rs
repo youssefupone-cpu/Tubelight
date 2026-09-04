@@ -36,3 +36,23 @@ async fn get_video_uses_dump_json_fixture() {
     assert_eq!(v.summary.id, "dQw4w9WgXcQ");
     assert!(!v.formats.is_empty());
 }
+
+#[tokio::test]
+async fn search_uses_flat_playlist_fixture() {
+    let fixture = include_str!("fixtures/search.json");
+    let runner: Arc<dyn CommandRunner> = Arc::new(StaticRunner { fixture, _exit: 0 });
+    let ytdlp = YtDlp::new(PathBuf::from("yt-dlp"), runner);
+    let svc = YtDlpYoutubeService { ytdlp };
+    let results = svc.search("Rust programming", 0).await.unwrap();
+    assert!(!results.is_empty());
+    assert_eq!(results.len(), 3);
+    assert_eq!(results[0].id, "9fYVNmBjRUs");
+    assert_eq!(results[0].title, "Rust Programming Tutorial #1 - What is Rust?");
+    assert_eq!(results[0].channel_id, "UCWs0E4Ig_ZtCi5mfu5oyYUzA");
+    assert_eq!(results[0].channel_title, "freeCodeCamp.org");
+    assert_eq!(results[0].view_count, Some(3200000));
+    assert_eq!(
+        results[0].thumbnail_url.as_deref(),
+        Some("https://i.ytimg.com/vi/9fYVNmBjRUs/hqdefault.jpg")
+    );
+}

@@ -1,5 +1,6 @@
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
+use yoube_yt_dlp::parser::{parse_dump_json, parse_list_formats};
 use yoube_yt_dlp::YtDlp;
 use yoube_yt_dlp::model::{Format, VideoSummary};
 
@@ -100,43 +101,122 @@ pub struct YtDlpYoutubeService {
 impl YoutubeService for YtDlpYoutubeService {
     async fn get_video(&self, id: &str) -> yoube_core::AppResult<Video> {
         let url = format!("https://www.youtube.com/watch?v={id}");
-        let summary = self.ytdlp.dump_json(&url).await?;
-        let formats = self.ytdlp.list_formats(&url).await?;
+        let v = self.ytdlp.dump_json_full(&url).await?;
+        let summary = parse_dump_json(&v)?;
+        let formats = parse_list_formats(&v)?;
         Ok(Video { summary, formats })
     }
-    async fn search(&self, q: &str, _page: u32) -> yoube_core::AppResult<Vec<VideoSummary>> {
-        let _url = format!("ytsearch:{q}");
-        Err(yoube_core::AppError::Internal(anyhow::anyhow!(
-            "search not yet implemented in phase 1.3"
-        )))
+    async fn search(&self, q: &str, page: u32) -> yoube_core::AppResult<Vec<VideoSummary>> {
+        // NOTE: `ytsearchN:` tells yt-dlp to fetch N results; real pagination
+        // needs `--playlist-items` (Phase-1 polish TODO).
+        let n = ((page + 1) * 20).to_string();
+        let url = format!("ytsearch{n}:{q}");
+        self.flat_list(&url).await
     }
-    async fn channel(&self, _id: &str) -> yoube_core::AppResult<Channel> {
-        Err(yoube_core::AppError::Internal(anyhow::anyhow!(
-            "channel not yet implemented"
-        )))
+    async fn channel(&self, id: &str) -> yoube_core::AppResult<Channel> {
+        let url = format!("https://www.youtube.com/channel/{id}");
+        let v = self.ytdlp.dump_json_full(&url).await?;
+        Ok(Channel {
+            id: id.to_string(),
+            title: v
+                .get("title")
+                .and_then(|x| x.as_str())
+                .unwrap_or_default()
+                .to_string(),
+            description: v
+                .get("description")
+                .and_then(|x| x.as_str())
+                .unwrap_or_default()
+                .to_string(),
+            thumb_url: v
+                .get("thumbnails")
+                .and_then(|t| t.as_array())
+                .and_then(|a| a.last())
+                .and_then(|t| t.get("url"))
+                .and_then(|u| u.as_str())
+                .map(String::from),
+        })
     }
     async fn channel_videos(
         &self,
-        _id: &str,
+        id: &str,
         _page: u32,
     ) -> yoube_core::AppResult<Vec<VideoSummary>> {
-        Err(yoube_core::AppError::Internal(anyhow::anyhow!(
-            "channel_videos not yet implemented"
-        )))
+        self.flat_list(&format!("https://www.youtube.com/channel/{id}/videos"))
+            .await
     }
-    async fn playlist(&self, _id: &str) -> yoube_core::AppResult<Playlist> {
-        Err(yoube_core::AppError::Internal(anyhow::anyhow!(
-            "playlist not yet implemented"
-        )))
+    async fn playlist(&self, id: &str) -> yoube_core::AppResult<Playlist> {
+        let url = format!("https://www.youtube.com/playlist?list={id}");
+        let args = [
+            "--flat-playlist",
+            "--skip-download",
+            "--dump-single-json",
+            "--no-warnings",
+            &url,
+        ];
+        let out = self.ytdlp.runner.output(&self.ytdlp.bin, &args).await?;
+        if !out.status.success() {
+            return Err(yoube_core::AppError::YtDlp(
+                String::from_utf8_lossy(&out.stderr).into_owned(),
+            ));
+        }
+        let v: serde_json::Value = serde_json::from_slice(&out.stdout)?;
+        let entries = v
+            .get("entries")
+            .and_then(|e| e.as_array())
+            .cloned()
+            .unwrap_or_default();
+        let items: Vec<VideoSummary> = entries
+            .into_iter()
+            .filter_map(|e| parse_dump_json(&e).ok())
+            .collect();
+        Ok(Playlist {
+            id: id.to_string(),
+            title: v
+                .get("title")
+                .and_then(|x| x.as_str())
+                .unwrap_or_default()
+                .to_string(),
+            channel_id: v
+                .get("channel_id")
+                .and_then(|x| x.as_str())
+                .unwrap_or_default()
+                .to_string(),
+            items,
+        })
     }
-    async fn trending(&self, _region: Region) -> yoube_core::AppResult<Vec<VideoSummary>> {
-        Err(yoube_core::AppError::Internal(anyhow::anyhow!(
-            "trending not yet implemented"
-        )))
+    async fn trending(&self, region: Region) -> yoube_core::AppResult<Vec<VideoSummary>> {
+        self.flat_list(&format!("https://www.youtube.com/feed/trending?gl={}", region.code())).await
     }
-    async fn related(&self, _id: &str) -> yoube_core::AppResult<Vec<VideoSummary>> {
-        Err(yoube_core::AppError::Internal(anyhow::anyhow!(
-            "related not yet implemented"
-        )))
+    async fn related(&self, id: &str) -> yoube_core::AppResult<Vec<VideoSummary>> {
+        self.flat_list(&format!("https://www.youtube.com/watch?v={id}")).await
+    }
+}
+
+impl YtDlpYoutubeService {
+    async fn flat_list(&self, url: &str) -> yoube_core::AppResult<Vec<VideoSummary>> {
+        let args = [
+            "--flat-playlist",
+            "--skip-download",
+            "--dump-single-json",
+            "--no-warnings",
+            url,
+        ];
+        let out = self.ytdlp.runner.output(&self.ytdlp.bin, &args).await?;
+        if !out.status.success() {
+            return Err(yoube_core::AppError::YtDlp(
+                String::from_utf8_lossy(&out.stderr).into_owned(),
+            ));
+        }
+        let v: serde_json::Value = serde_json::from_slice(&out.stdout)?;
+        let entries = v
+            .get("entries")
+            .and_then(|e| e.as_array())
+            .cloned()
+            .unwrap_or_default();
+        Ok(entries
+            .into_iter()
+            .filter_map(|e| parse_dump_json(&e).ok())
+            .collect())
     }
 }

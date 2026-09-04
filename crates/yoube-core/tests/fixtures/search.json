@@ -1,0 +1,60 @@
+{
+  "_type": "search_result",
+  "query": "Rust programming",
+  "entries": [
+    {
+      "id": "9fYVNmBjRUs",
+      "title": "Rust Programming Tutorial #1 - What is Rust?",
+      "channel": "freeCodeCamp.org",
+      "uploader": "freeCodeCamp.org",
+      "uploader_id": "freecodecamp",
+      "channel_id": "UCWs0E4Ig_ZtCi5mfu5oyYUzA",
+      "channel_url": "https://www.youtube.com/@freecodecamp",
+      "duration": 1200,
+      "duration_string": "20:00",
+      "view_count": 3200000,
+      "upload_date": "20230815",
+      "thumbnail": "https://i.ytimg.com/vi/9fYVNmBjRUs/hqdefault.jpg",
+      "thumbnails": [
+        { "url": "https://i.ytimg.com/vi/9fYVNmBjRUs/hqdefault.jpg", "id": "0", "height": 360, "width": 640 }
+      ],
+      "epoch": 1692086400
+    },
+    {
+      "id": "yg2YJnQwJqk",
+      "title": "Learn Rust in 100 Minutes - Absolute Beginner",
+      "channel": "Fireship",
+      "uploader": "Fireship",
+      "uploader_id": "fireship",
+      "channel_id": "UCsBjURr19ZKHfmbUmdpv6Qw",
+      "channel_url": "https://www.youtube.com/@Fireship",
+      "duration": 600,
+      "duration_string": "10:00",
+      "view_count": 5100000,
+      "upload_date": "20230520",
+      "thumbnail": "https://i.ytimg.com/vi/yg2YJnQwJqk/hqdefault.jpg",
+      "thumbnails": [
+        { "url": "https://i.ytimg.com/vi/yg2YJnQwJqk/hqdefault.jpg", "id": "0", "height": 360, "width": 640 }
+      ],
+      "epoch": 1684598400
+    },
+    {
+      "id": "LnjsMWpLHDc",
+      "title": "Rust Crash Course - Rust Beginner Tutorial",
+      "channel": "Traversy Media",
+      "uploader": "Traversy Media",
+      "uploader_id": "traversyMedia",
+      "channel_id": "UCBWNjewks1uzos487jfGYEww",
+      "channel_url": "https://www.youtube.com/@traversyMedia",
+      "duration": 900,
+      "duration_string": "15:00",
+      "view_count": 1700000,
+      "upload_date": "20230701",
+      "thumbnail": "https://i.ytimg.com/vi/LnjsMWpLHDc/hqdefault.jpg",
+      "thumbnails": [
+        { "url": "https://i.ytimg.com/vi/LnjsMWpLHDc/hqdefault.jpg", "id": "0", "height": 360, "width": 640 }
+      ],
+      "epoch": 1688169600
+    }
+  ]
+}
