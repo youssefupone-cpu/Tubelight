@@ -7,6 +7,7 @@ target/
 dist/
 build/
 out/
+*.tsbuildinfo
 *.app/
 *.dmg
 *.deb
