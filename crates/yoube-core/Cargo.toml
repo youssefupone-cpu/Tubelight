@@ -4,28 +4,30 @@ version.workspace = true
 edition.workspace = true
 license.workspace = true
 [dependencies]
-# NOTE: yoube-yt-dlp is intentionally NOT declared here. Declaring it would
-# create a package-level cycle (yoube-yt-dlp -> yoube-core for AppResult, and
-# yoube-core -> yoube-yt-dlp), which Cargo rejects regardless of `optional`.
-# yoube-core does not reference the yoube_yt_dlp crate in code today (only the
-# AppError::YtDlp(String) variant). Task 1.3 (wiring YoutubeService) should
-# re-add it via a design that avoids this cycle (e.g., shared error crate or
-# dependency injection).
+# Package dependency graph is a DAG, intentionally:
+#   yoube-error (leaf: AppError/AppResult) ← {yoube-yt-dlp, yoube-core, yoube-storage, …}
+# The AppError/AppResult types live in `yoube-error` so the leaf crate has no
+# back-edge to yoube-core; this is what breaks what would otherwise be a cycle
+# (yoube-core → yoube-yt-dlp for the YtDlp/YoutubeService bridge, and
+# yoube-yt-dlp → yoube-core for AppResult). yoube-core depends on yoube-yt-dlp
+# at will — no cycle because the shared boundary type is in yoube-error.
+# Future leaf crates (yoube-storage, yoube-filter, yoube-dns) follow the same
+# pattern: depend on `yoube-error`, not on `yoube-core`.
+yoube-error = { path = "../yoube-error" }
+yoube-yt-dlp = { path = "../yoube-yt-dlp" }
 yoube-filter = { path = "../yoube-filter" }
 yoube-dns = { path = "../yoube-dns" }
 yoube-storage = { path = "../yoube-storage" }
 tokio.workspace = true
 serde.workspace = true
 serde_json.workspace = true
-    thiserror.workspace = true
-    anyhow.workspace = true
-    async-trait.workspace = true
-    tracing.workspace = true
-    reqwest.workspace = true
-    sqlx.workspace = true
-    yoube-yt-dlp = { path = "../yoube-yt-dlp" }
-    yoube-error = { path = "../yoube-error" }
-    specta = { version = "2.0.0-rc.25", optional = true, default-features = false }
+thiserror.workspace = true
+anyhow.workspace = true
+async-trait.workspace = true
+tracing.workspace = true
+reqwest.workspace = true
+sqlx.workspace = true
+specta = { version = "2.0.0-rc.25", optional = true, default-features = false }
 
 [features]
 default = []
