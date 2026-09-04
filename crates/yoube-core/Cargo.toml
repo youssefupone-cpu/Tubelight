@@ -2,3 +2,16 @@
 name = "yoube-core"
 version.workspace = true
 edition.workspace = true
+license.workspace = true
+[dependencies]
+yoube-yt-dlp = { path = "../yoube-yt-dlp" }
+yoube-filter = { path = "../yoube-filter" }
+yoube-dns = { path = "../yoube-dns" }
+yoube-storage = { path = "../yoube-storage" }
+tokio.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+anyhow.workspace = true
+async-trait.workspace = true
+tracing.workspace = true
