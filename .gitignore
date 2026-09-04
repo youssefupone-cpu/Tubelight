@@ -1,0 +1,27 @@
+# opencode
+.opencode/
+node_modules/
+
+# build artifacts
+target/
+dist/
+build/
+out/
+*.app/
+*.dmg
+*.deb
+*.AppImage
+*.exe
+*.msi
+*.nsis.zip
+
+# editor
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# secrets / local
+.env
+.env.local
+*.local
