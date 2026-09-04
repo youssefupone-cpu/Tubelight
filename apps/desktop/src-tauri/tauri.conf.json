@@ -13,5 +13,9 @@
     "windows": [{ "label": "main", "title": "yoube", "width": 1280, "height": 800 }],
     "security": { "csp": null }
   },
-  "bundle": { "active": true, "targets": "all" }
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "externalBin": ["../../sidecars/yt-dlp/yt-dlp"]
+  }
 }

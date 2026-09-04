@@ -3,5 +3,12 @@
   "identifier": "default",
   "description": "yoube default capabilities",
   "windows": ["main"],
-  "permissions": ["core:default"]
+  "permissions": [
+    "core:default",
+    "shell:default",
+    {
+      "identifier": "shell:allow-execute",
+      "allow": [{ "name": "bin-sidecar", "sidecar": true, "args": true }]
+    }
+  ]
 }
