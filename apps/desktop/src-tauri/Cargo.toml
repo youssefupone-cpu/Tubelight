@@ -9,6 +9,16 @@ tauri = { version = "2", features = [] }
 serde.workspace = true
 serde_json.workspace = true
 yoube-core = { path = "../../../crates/yoube-core" }
-specta = { version = "2", features = ["derive"] }
-specta-typescript = "0.0"
-tauri-specta = { version = "2", features = ["derive", "typescript"] }
+# The specta/tauri-specta typegen integration (`feat(contracts)`) is offline-
+# incompatible: the offline index only carries pre-release specta 2.0.0-rc.25,
+# which `^2` cannot select, and its RC cascade (tauri 2.x stable, bevy_ecs,
+# bson^3, ...) is not present offline. It is commented out so the pure-Rust
+# crates can be built and tested offline (Task 1.1). Restore when stable
+# specta 2.x + network are available.
+# specta = { version = "2", optional = true, features = ["derive"] }
+# specta-typescript = { version = "0.0", optional = true }
+# tauri-specta = { version = "2", optional = true, features = ["derive", "typescript"] }
+
+[features]
+default = []
+# contracts = ["dep:specta", "dep:specta-typescript", "dep:tauri-specta"]

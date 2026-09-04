@@ -4,7 +4,13 @@ version.workspace = true
 edition.workspace = true
 license.workspace = true
 [dependencies]
-yoube-yt-dlp = { path = "../yoube-yt-dlp" }
+# NOTE: yoube-yt-dlp is intentionally NOT declared here. Declaring it would
+# create a package-level cycle (yoube-yt-dlp -> yoube-core for AppResult, and
+# yoube-core -> yoube-yt-dlp), which Cargo rejects regardless of `optional`.
+# yoube-core does not reference the yoube_yt_dlp crate in code today (only the
+# AppError::YtDlp(String) variant). Task 1.3 (wiring YoutubeService) should
+# re-add it via a design that avoids this cycle (e.g., shared error crate or
+# dependency injection).
 yoube-filter = { path = "../yoube-filter" }
 yoube-dns = { path = "../yoube-dns" }
 yoube-storage = { path = "../yoube-storage" }

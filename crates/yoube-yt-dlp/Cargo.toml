@@ -3,3 +3,16 @@ name = "yoube-yt-dlp"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
+
+[dependencies]
+yoube-core = { path = "../yoube-core" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+async-trait = { workspace = true }
+tokio = { workspace = true, features = ["process"] }
+anyhow = { workspace = true }
+specta = { version = "2.0.0-rc.25", optional = true, default-features = false }
+
+[features]
+default = []
+specta = ["dep:specta"]
