@@ -109,3 +109,106 @@ export function playlist(id: string): Promise<Playlist> {
 export function trending(_region: Region): Promise<VideoSummary[]> {
   return Promise.resolve([]);
 }
+
+// --- AccountService contracts (Task 2.2) ---
+// Hand-stubbed mirroring crates/yoube-core/src/services/account.rs.
+// Replaced by tauri-specta typegen on machines with the GTK stack.
+
+export interface UserProfile {
+  id: number;
+  name: string;
+  avatar_path: string | null;
+}
+
+export interface ChannelRef {
+  id: string;
+  title: string;
+  thumb_url: string | null;
+}
+
+export interface AccountPlaylist {
+  id: number;
+  title: string;
+  description: string | null;
+  is_watch_later: boolean;
+  is_liked: boolean;
+  count: number;
+}
+
+export interface HistoryEntryView {
+  video_id: string;
+  title: string;
+  channel_title: string | null;
+  duration_s: number | null;
+  thumb_url: string | null;
+  watched_at: string;
+  position_s: number;
+}
+
+export function current_user(): Promise<UserProfile> {
+  return Promise.resolve({ id: 1, name: "yoube", avatar_path: null });
+}
+
+export function switch_user(_id: number): Promise<void> {
+  return Promise.resolve();
+}
+
+export function create_user(name: string): Promise<UserProfile> {
+  return Promise.resolve({ id: 1, name, avatar_path: null });
+}
+
+export function delete_user(_id: number): Promise<void> {
+  return Promise.resolve();
+}
+
+export function subscriptions(): Promise<ChannelRef[]> {
+  return Promise.resolve([]);
+}
+
+export function subscribe(
+  _channel_id: string,
+  _title: string,
+  _thumb_url?: string | null,
+): Promise<void> {
+  return Promise.resolve();
+}
+
+export function unsubscribe(_channel_id: string): Promise<void> {
+  return Promise.resolve();
+}
+
+export function playlists(): Promise<AccountPlaylist[]> {
+  return Promise.resolve([]);
+}
+
+export function playlist_items(_id: number): Promise<VideoSummary[]> {
+  return Promise.resolve([]);
+}
+
+export function playlist_add(_id: number, _video: VideoSummary): Promise<void> {
+  return Promise.resolve();
+}
+
+export function playlist_remove(_id: number, _video_id: string): Promise<void> {
+  return Promise.resolve();
+}
+
+export function history(_page: number): Promise<HistoryEntryView[]> {
+  return Promise.resolve([]);
+}
+
+export function history_clear(): Promise<void> {
+  return Promise.resolve();
+}
+
+export function like(_video: VideoSummary): Promise<void> {
+  return Promise.resolve();
+}
+
+export function unlike(_video_id: string): Promise<void> {
+  return Promise.resolve();
+}
+
+export function watch_later(_video: VideoSummary): Promise<void> {
+  return Promise.resolve();
+}
