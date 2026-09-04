@@ -3,12 +3,109 @@
 // which calls Builder::export -> ../src/bindings.ts). Overwritten on every debug build that reaches
 // `run()`; this hand-written copy exists so the TypeScript side typechecks/builds in headless CI.
 
+export type AppError = string;
+
 export interface PingResponse {
   value: string;
 }
 
-export type AppError = string;
+export interface VideoSummary {
+  id: string;
+  title: string;
+  channel_id: string;
+  channel_title: string;
+  duration_s?: number | null;
+  view_count?: number | null;
+  upload_date?: string | null;
+  thumbnail_url?: string | null;
+}
+
+export interface Format {
+  format_id: string;
+  ext: string;
+  url?: string | null;
+  resolution?: string | null;
+  fps?: number | null;
+  vcodec?: string | null;
+  acodec?: string | null;
+  filesize?: number | null;
+  tbr?: number | null;
+  note?: string | null;
+}
+
+export interface Video {
+  summary: VideoSummary;
+  formats: Format[];
+}
+
+export interface Channel {
+  id: string;
+  title: string;
+  description: string;
+  thumb_url: string | null;
+}
+
+export interface Playlist {
+  id: string;
+  title: string;
+  channel_id: string;
+  items: VideoSummary[];
+}
+
+export enum Region {
+  US,
+  GB,
+  EG,
+  SA,
+  DE,
+  FR,
+  JP,
+  BR,
+  IN,
+  AU,
+  CA,
+  MX,
+  ES,
+  IT,
+  RU,
+  TR,
+  ZA,
+  NG,
+  KR,
+  AR,
+}
 
 export function ping(): Promise<PingResponse> {
   return Promise.resolve({ value: "pong" });
+}
+
+export function get_video(v: string): Promise<Video> {
+  return Promise.resolve({
+    summary: { id: v, title: "", channel_id: "", channel_title: "" },
+    formats: [],
+  });
+}
+
+export function related(_v: string): Promise<VideoSummary[]> {
+  return Promise.resolve([]);
+}
+
+export function search(_q: string, _page: number): Promise<VideoSummary[]> {
+  return Promise.resolve([]);
+}
+
+export function channel(id: string): Promise<Channel> {
+  return Promise.resolve({ id, title: "", description: "", thumb_url: null });
+}
+
+export function channel_videos(_id: string, _page: number): Promise<VideoSummary[]> {
+  return Promise.resolve([]);
+}
+
+export function playlist(id: string): Promise<Playlist> {
+  return Promise.resolve({ id, title: "", channel_id: "", items: [] });
+}
+
+export function trending(_region: Region): Promise<VideoSummary[]> {
+  return Promise.resolve([]);
 }
