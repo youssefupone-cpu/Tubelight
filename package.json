@@ -10,6 +10,7 @@
     "build": "pnpm --filter @yoube/desktop tauri build",
     "lint": "pnpm -r --parallel lint",
     "test": "pnpm -r --parallel test",
+    "gen:contracts": "pnpm --filter @yoube/desktop gen:contracts && pnpm --filter @yoube/contracts build",
     "format": "biome format --write ."
   },
   "devDependencies": {

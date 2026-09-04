@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { invoke } from "@tauri-apps/api/core";
+import { ping } from "@yoube/contracts";
 
 export function App() {
   const [pong, setPong] = useState<string>("…");
-  useEffect(() => { invoke<string>("ping").then(setPong).catch(console.error); }, []);
+  useEffect(() => { ping().then(r => setPong(r.value)).catch(console.error); }, []);
   return <main style={{ font: "16px system-ui", padding: 24 }}>yoube — {pong}</main>;
 }

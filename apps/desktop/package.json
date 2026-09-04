@@ -8,11 +8,13 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "tauri": "tauri",
+    "gen:contracts": "node scripts/gen-contracts.mjs",
     "lint": "biome check .",
     "test": "vitest run"
   },
   "dependencies": {
     "@tauri-apps/api": "^2.1.1",
+    "@yoube/contracts": "workspace:*",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
