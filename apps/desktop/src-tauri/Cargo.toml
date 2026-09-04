@@ -2,3 +2,10 @@
 name = "yoube-desktop"
 version.workspace = true
 edition.workspace = true
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+[dependencies]
+tauri = { version = "2", features = [] }
+serde.workspace = true
+serde_json.workspace = true
+yoube-core = { path = "../../../crates/yoube-core" }
