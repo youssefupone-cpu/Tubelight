@@ -17,9 +17,20 @@ yoube-storage = { path = "../yoube-storage" }
 tokio.workspace = true
 serde.workspace = true
 serde_json.workspace = true
-thiserror.workspace = true
-anyhow.workspace = true
-async-trait.workspace = true
-tracing.workspace = true
-reqwest.workspace = true
-sqlx.workspace = true
+    thiserror.workspace = true
+    anyhow.workspace = true
+    async-trait.workspace = true
+    tracing.workspace = true
+    reqwest.workspace = true
+    sqlx.workspace = true
+    yoube-yt-dlp = { path = "../yoube-yt-dlp" }
+    yoube-error = { path = "../yoube-error" }
+    specta = { version = "2.0.0-rc.25", optional = true, default-features = false }
+
+[features]
+default = []
+# `specta` is feature-gated and offline-deferred: `--features specta` requires
+# cached `specta-macros`/proc-macro closure which this offline index lacks.
+# The `cfg_attr(feature = "specta", derive(specta::Type))` gates keep the
+# default offline build clean. Restore under network (Task 1.4 contracts).
+specta = ["dep:specta", "yoube-yt-dlp/specta"]

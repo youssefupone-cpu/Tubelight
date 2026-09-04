@@ -1,46 +1,38 @@
+use std::sync::Arc;
+
 use yoube_core::AppContext;
+use yoube_core::services::youtube::YtDlpYoutubeService;
+use yoube_yt_dlp::runner::TokioCommandRunner;
+use yoube_yt_dlp::YtDlp;
 
-#[cfg(feature = "contracts")]
-use specta::Type;
-#[cfg(feature = "contracts")]
-use tauri_specta::{collect_commands, Builder as SpectaBuilder};
-
-#[derive(serde::Serialize, serde::Deserialize)]
-#[cfg_attr(feature = "contracts", derive(Type))]
-pub struct PingResponse { pub value: String }
+mod commands;
+mod sidecar;
 
 #[tauri::command]
-#[cfg_attr(feature = "contracts", specta::specta)]
-fn ping(ctx: tauri::State<'_, AppContext>) -> Result<PingResponse, yoube_core::AppError> {
-    Ok(PingResponse { value: ctx.ping()?.to_string() })
+fn ping(ctx: tauri::State<'_, AppContext>) -> Result<String, yoube_core::AppError> {
+    Ok(ctx.ping()?.to_string())
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    #[cfg(feature = "contracts")]
-    {
-        let builder = SpectaBuilder::<tauri::Wry>::default()
-            .commands(collect_commands![ping]);
-
-        #[cfg(debug_assertions)]
-        {
-            builder
-                .export(specta_typescript::Typescript::default(), "../src/bindings.ts")
-                .expect("failed to export typescript bindings");
-        }
-
-        tauri::Builder::default()
-            .manage(AppContext::new())
-            .invoke_handler(builder.invoke_handler())
-            .setup(move |app| { builder.mount_events(app); Ok(()) })
-            .run(tauri::generate_context!())
-            .expect("error while running tauri application");
-    }
-
-    #[cfg(not(feature = "contracts"))]
     tauri::Builder::default()
-        .manage(AppContext::new())
-        .invoke_handler(tauri::generate_handler![ping])
+        .setup(|app| {
+            let bin = crate::sidecar::yt_dlp_path(app.handle());
+            let ytdlp = YtDlp::new(bin, Arc::new(TokioCommandRunner));
+            let ctx = AppContext::new(Arc::new(YtDlpYoutubeService { ytdlp }));
+            app.manage(ctx);
+            Ok(())
+        })
+        .invoke_handler(tauri::generate_handler![
+            ping,
+            commands::get_video,
+            commands::search,
+            commands::channel,
+            commands::channel_videos,
+            commands::playlist,
+            commands::trending,
+            commands::related
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

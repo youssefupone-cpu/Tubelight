@@ -5266,13 +5266,16 @@ dependencies = [
  "reqwest 0.12.28",
  "serde",
  "serde_json",
+ "specta",
  "sqlx",
  "thiserror 2.0.20",
  "tokio",
  "tracing",
  "yoube-dns",
+ "yoube-error",
  "yoube-filter",
  "yoube-storage",
+ "yoube-yt-dlp",
 ]
 
 [[package]]
@@ -5284,11 +5287,24 @@ dependencies = [
  "tauri",
  "tauri-build",
  "yoube-core",
+ "yoube-yt-dlp",
 ]
 
 [[package]]
 name = "yoube-dns"
 version = "0.0.1"
+
+[[package]]
+name = "yoube-error"
+version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "reqwest 0.12.28",
+ "serde",
+ "serde_json",
+ "sqlx",
+ "thiserror 2.0.20",
+]
 
 [[package]]
 name = "yoube-filter"
@@ -5308,7 +5324,7 @@ dependencies = [
  "serde_json",
  "specta",
  "tokio",
- "yoube-core",
+ "yoube-error",
 ]
 
 [[package]]

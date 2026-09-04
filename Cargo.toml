@@ -3,6 +3,7 @@ resolver = "2"
 members = [
     "apps/desktop/src-tauri",
     "crates/yoube-core",
+    "crates/yoube-error",
     "crates/yoube-yt-dlp",
     "crates/yoube-filter",
     "crates/yoube-dns",

@@ -1,6 +1,6 @@
 use async_trait::async_trait;
 use std::path::Path;
-use yoube_core::AppResult;
+use yoube_error::AppResult;
 
 #[async_trait]
 pub trait CommandRunner: Send + Sync {

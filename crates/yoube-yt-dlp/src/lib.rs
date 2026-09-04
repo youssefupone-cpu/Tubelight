@@ -4,13 +4,13 @@ pub mod model;
 pub mod parser;
 pub mod runner;
 
-use std::path::PathBuf;
-use std::sync::Arc;
-use serde_json::Value;
-use yoube_core::{AppError, AppResult};
 use crate::model::{Format, VideoSummary};
 use crate::parser::{parse_dump_json, parse_list_formats};
 use crate::runner::CommandRunner;
+use serde_json::Value;
+use std::path::PathBuf;
+use std::sync::Arc;
+use yoube_error::{AppError, AppResult};
 
 #[derive(Clone)]
 pub struct YtDlp {
@@ -19,21 +19,37 @@ pub struct YtDlp {
 }
 
 impl YtDlp {
-    pub fn new(bin: PathBuf, runner: Arc<dyn CommandRunner>) -> Self { Self { bin, runner } }
+    pub fn new(bin: PathBuf, runner: Arc<dyn CommandRunner>) -> Self {
+        Self { bin, runner }
+    }
     pub async fn dump_json(&self, url: &str) -> AppResult<VideoSummary> {
-        let args = ["--skip-download", "--dump-single-json", "--no-warnings", url];
+        let args = [
+            "--skip-download",
+            "--dump-single-json",
+            "--no-warnings",
+            url,
+        ];
         let out = self.runner.output(&self.bin, &args).await?;
         if !out.status.success() {
-            return Err(AppError::YtDlp(String::from_utf8_lossy(&out.stderr).into_owned()));
+            return Err(AppError::YtDlp(
+                String::from_utf8_lossy(&out.stderr).into_owned(),
+            ));
         }
         let v: Value = serde_json::from_slice(&out.stdout)?;
         parse_dump_json(&v)
     }
     pub async fn list_formats(&self, url: &str) -> AppResult<Vec<Format>> {
-        let args = ["--skip-download", "--dump-single-json", "--no-warnings", url];
+        let args = [
+            "--skip-download",
+            "--dump-single-json",
+            "--no-warnings",
+            url,
+        ];
         let out = self.runner.output(&self.bin, &args).await?;
         if !out.status.success() {
-            return Err(AppError::YtDlp(String::from_utf8_lossy(&out.stderr).into_owned()));
+            return Err(AppError::YtDlp(
+                String::from_utf8_lossy(&out.stderr).into_owned(),
+            ));
         }
         let v: Value = serde_json::from_slice(&out.stdout)?;
         parse_list_formats(&v)
