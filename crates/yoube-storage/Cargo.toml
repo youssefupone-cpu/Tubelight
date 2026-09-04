@@ -1,0 +1,4 @@
+[package]
+name = "yoube-storage"
+version.workspace = true
+edition.workspace = true

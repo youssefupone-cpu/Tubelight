@@ -1,0 +1,4 @@
+[package]
+name = "yoube-desktop"
+version.workspace = true
+edition.workspace = true

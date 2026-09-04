@@ -1,0 +1,4 @@
+[package]
+name = "yoube-yt-dlp"
+version.workspace = true
+edition.workspace = true
