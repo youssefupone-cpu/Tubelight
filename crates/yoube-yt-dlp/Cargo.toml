@@ -11,6 +11,8 @@ serde_json = { workspace = true }
 async-trait = { workspace = true }
 tokio = { workspace = true, features = ["process"] }
 anyhow = { workspace = true }
+dashmap = { workspace = true }
+libc = "0.2"
 specta = { version = "2.0.0-rc.25", optional = true, default-features = false }
 
 [features]

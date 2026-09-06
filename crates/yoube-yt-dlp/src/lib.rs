@@ -1,5 +1,6 @@
 //! yoube-yt-dlp: thin wrapper around the yt-dlp binary.
 
+pub mod downloader;
 pub mod model;
 pub mod parser;
 pub mod runner;
