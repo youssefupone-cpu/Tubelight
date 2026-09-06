@@ -80,6 +80,8 @@ pub fn run() {
             commands::like,
             commands::unlike,
             commands::watch_later,
+            commands::export_account,
+            commands::import_account,
             commands::list_formats,
             commands::download_enqueue,
             commands::download_pause,

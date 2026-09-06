@@ -166,6 +166,42 @@ pub async fn watch_later(ctx: State<'_, AppContext>, video: VideoSummary) -> Res
     ctx.account.watch_later(&video).await
 }
 
+/// Expand a user-supplied file path: rejects empties and resolves a leading
+/// `~/` against `$HOME` (Unix) / `%USERPROFILE%` (Windows). Std-only so no
+/// new crate dependency is needed for the export/import flow.
+fn expand_user_path(raw: &str) -> Result<std::path::PathBuf, AppError> {
+    let trimmed = raw.trim();
+    if trimmed.is_empty() {
+        return Err(AppError::NotFound("empty path: choose a file first".into()));
+    }
+    if let Some(rest) = trimmed
+        .strip_prefix("~/")
+        .or_else(|| trimmed.strip_prefix("~\\"))
+    {
+        let home = std::env::var("HOME")
+            .or_else(|_| std::env::var("USERPROFILE"))
+            .map_err(|_| AppError::NotFound("cannot resolve home directory".into()))?;
+        Ok(std::path::PathBuf::from(home).join(rest))
+    } else {
+        Ok(std::path::PathBuf::from(trimmed))
+    }
+}
+
+#[tauri::command]
+// #[specta::specta]
+pub async fn export_account(ctx: State<'_, AppContext>, dest: String) -> Result<String, AppError> {
+    let path = expand_user_path(&dest)?;
+    ctx.account.export(&path).await?;
+    Ok(path.to_string_lossy().into_owned())
+}
+
+#[tauri::command]
+// #[specta::specta]
+pub async fn import_account(ctx: State<'_, AppContext>, src: String) -> Result<(), AppError> {
+    let path = expand_user_path(&src)?;
+    ctx.account.import(&path).await
+}
+
 #[tauri::command]
 // #[specta::specta]
 pub async fn list_formats(
