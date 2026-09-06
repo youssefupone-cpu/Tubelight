@@ -2,8 +2,8 @@ use tauri::State;
 use yoube_core::AppContext;
 use yoube_core::AppError;
 use yoube_core::UserProfile;
-use yoube_core::services::youtube::{Channel, Playlist, Region, Video};
 use yoube_core::services::account::{ChannelRef, HistoryEntryView, Playlist as AccountPlaylist};
+use yoube_core::services::youtube::{Channel, Playlist, Region, Video};
 use yoube_yt_dlp::model::VideoSummary;
 
 #[tauri::command]
@@ -73,7 +73,10 @@ pub async fn switch_user(ctx: State<'_, AppContext>, id: i64) -> Result<(), AppE
 }
 
 #[tauri::command]
-pub async fn create_user(ctx: State<'_, AppContext>, name: String) -> Result<UserProfile, AppError> {
+pub async fn create_user(
+    ctx: State<'_, AppContext>,
+    name: String,
+) -> Result<UserProfile, AppError> {
     ctx.account.create_user(&name).await
 }
 
@@ -88,8 +91,15 @@ pub async fn subscriptions(ctx: State<'_, AppContext>) -> Result<Vec<ChannelRef>
 }
 
 #[tauri::command]
-pub async fn subscribe(ctx: State<'_, AppContext>, channel_id: String, title: String, thumb_url: Option<String>) -> Result<(), AppError> {
-    ctx.account.subscribe(&channel_id, &title, thumb_url.as_deref()).await
+pub async fn subscribe(
+    ctx: State<'_, AppContext>,
+    channel_id: String,
+    title: String,
+    thumb_url: Option<String>,
+) -> Result<(), AppError> {
+    ctx.account
+        .subscribe(&channel_id, &title, thumb_url.as_deref())
+        .await
 }
 
 #[tauri::command]
@@ -103,22 +113,36 @@ pub async fn playlists(ctx: State<'_, AppContext>) -> Result<Vec<AccountPlaylist
 }
 
 #[tauri::command]
-pub async fn playlist_items(ctx: State<'_, AppContext>, id: i64) -> Result<Vec<VideoSummary>, AppError> {
+pub async fn playlist_items(
+    ctx: State<'_, AppContext>,
+    id: i64,
+) -> Result<Vec<VideoSummary>, AppError> {
     ctx.account.playlist_items(id).await
 }
 
 #[tauri::command]
-pub async fn playlist_add(ctx: State<'_, AppContext>, id: i64, video: VideoSummary) -> Result<(), AppError> {
+pub async fn playlist_add(
+    ctx: State<'_, AppContext>,
+    id: i64,
+    video: VideoSummary,
+) -> Result<(), AppError> {
     ctx.account.playlist_add(id, &video).await
 }
 
 #[tauri::command]
-pub async fn playlist_remove(ctx: State<'_, AppContext>, id: i64, video_id: String) -> Result<(), AppError> {
+pub async fn playlist_remove(
+    ctx: State<'_, AppContext>,
+    id: i64,
+    video_id: String,
+) -> Result<(), AppError> {
     ctx.account.playlist_remove(id, &video_id).await
 }
 
 #[tauri::command]
-pub async fn history(ctx: State<'_, AppContext>, page: u32) -> Result<Vec<HistoryEntryView>, AppError> {
+pub async fn history(
+    ctx: State<'_, AppContext>,
+    page: u32,
+) -> Result<Vec<HistoryEntryView>, AppError> {
     ctx.account.history(page).await
 }
 

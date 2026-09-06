@@ -7,8 +7,8 @@ use yoube_core::services::downloader::YtDlpDownloaderService;
 use yoube_core::services::filter::AppFilterService;
 use yoube_core::services::youtube::YtDlpYoutubeService;
 use yoube_storage::Storage;
-use yoube_yt_dlp::runner::TokioCommandRunner;
 use yoube_yt_dlp::YtDlp;
+use yoube_yt_dlp::runner::TokioCommandRunner;
 
 mod commands;
 mod sidecar;
@@ -27,9 +27,8 @@ pub fn run() {
             // handle below so every metadata/download call is screened.
             let data_dir = app.path().data_dir().join("yoube");
             std::fs::create_dir_all(&data_dir)?;
-            let filter: std::sync::Arc<AppFilterService> = std::sync::Arc::new(
-                AppFilterService::new(data_dir.join("cache"))?,
-            );
+            let filter: std::sync::Arc<AppFilterService> =
+                std::sync::Arc::new(AppFilterService::new(data_dir.join("cache"))?);
 
             let bin = crate::sidecar::yt_dlp_path(app.handle());
             let ytdlp = YtDlp::new(bin, Arc::new(TokioCommandRunner))
@@ -37,8 +36,7 @@ pub fn run() {
             let youtube = Arc::new(YtDlpYoutubeService {
                 ytdlp: ytdlp.clone(),
             });
-            let downloader =
-                Arc::new(YtDlpDownloaderService::new(ytdlp));
+            let downloader = Arc::new(YtDlpDownloaderService::new(ytdlp));
 
             // Resolve the per-user data directory then open (or create) the DB.
             // `setup` is synchronous, so drive the async storage init with the
@@ -51,9 +49,7 @@ pub fn run() {
                 Ok::<_, yoube_core::AppError>(s)
             })?;
             let account = Arc::new(StorageAccountService::new(storage));
-            let dnsblock = Arc::new(AppDnsBlockService::production(
-                data_dir.join("backups"),
-            )?);
+            let dnsblock = Arc::new(AppDnsBlockService::production(data_dir.join("backups"))?);
 
             let ctx = AppContext::new(youtube, account, downloader, filter, dnsblock);
             app.manage(ctx);
