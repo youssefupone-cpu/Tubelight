@@ -25,6 +25,7 @@ export const Route = createRootRoute({
 				</Link>
 				<Link
 					to="/settings"
+					search={{ tab: "general" }}
 					className="text-sm text-neutral-400 hover:text-white"
 				>
 					Settings

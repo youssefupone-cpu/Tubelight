@@ -5429,6 +5429,13 @@ dependencies = [
 [[package]]
 name = "yoube-dns"
 version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "reqwest 0.12.28",
+ "tempfile",
+ "tokio",
+ "yoube-error",
+]
 
 [[package]]
 name = "yoube-error"

@@ -1,10 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useSearch } from "@tanstack/react-router";
-import { get_video, related } from "@yoube/contracts";
+import { filter_segments_for, get_video, related } from "@yoube/contracts";
 import { useState } from "react";
 import { FormatPicker } from "../components/FormatPicker";
 import { Player } from "../components/Player";
 import { VideoCard } from "../components/VideoCard";
+import { DEFAULT_SKIP_CATEGORIES, useSetting } from "../hooks/useSettings";
 
 export const Route = createFileRoute("/watch")({
 	validateSearch: (search) => ({
@@ -16,6 +17,11 @@ export const Route = createFileRoute("/watch")({
 function Watch() {
 	const { v } = useSearch({ from: "/watch" });
 	const [pickerOpen, setPickerOpen] = useState(false);
+	const [l3Enabled] = useSetting("l3_enabled", true);
+	const [skipCats] = useSetting<readonly string[]>(
+		"l3_categories",
+		DEFAULT_SKIP_CATEGORIES,
+	);
 	const vid = useQuery({
 		queryKey: ["video", v],
 		queryFn: () => get_video(v),
@@ -25,6 +31,12 @@ function Watch() {
 		queryKey: ["related", v],
 		queryFn: () => related(v),
 		enabled: !!v,
+	});
+	const segments = useQuery({
+		queryKey: ["segments", v],
+		queryFn: () => filter_segments_for(v),
+		enabled: !!v && l3Enabled,
+		staleTime: 1000 * 60 * 60,
 	});
 	if (vid.isPending) return <div className="p-4">Loading…</div>;
 	if (vid.error)
@@ -40,11 +52,19 @@ function Watch() {
 					<Player
 						src={best.url ?? ""}
 						poster={vid.data.summary.thumbnail_url ?? undefined}
+						segments={segments.data ?? []}
+						skipEnabled={l3Enabled}
+						skipCategories={skipCats}
 					/>
 				</div>
 				<h1 className="text-xl font-semibold mt-3">{vid.data.summary.title}</h1>
 				<div className="text-sm text-neutral-400">
 					{vid.data.summary.channel_title}
+					{(segments.data?.length ?? 0) > 0 && (
+						<span className="ml-2 rounded-full bg-neutral-800 px-2 py-0.5 text-xs">
+							{segments.data?.length} skips
+						</span>
+					)}
 				</div>
 				<div className="mt-2">
 					<button
