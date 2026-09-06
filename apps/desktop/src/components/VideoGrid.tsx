@@ -1,40 +1,21 @@
-import { useVirtualizer } from "@tanstack/react-virtual";
-import { useRef } from "react";
-import { VideoCard } from "./VideoCard";
 import type { VideoSummary } from "@yoube/contracts";
+import { VideoCard } from "./VideoCard";
 
+/**
+ * Plain responsive grid.
+ *
+ * NOTE: this deliberately replaces the earlier TanStack-Virtual prototype,
+ * which treated every *item* as a virtual *row* while rendering 4 items per
+ * row — rows overlapped and videos repeated on screen. A plain grid is
+ * correct for feed-sized lists; reintroduce virtualization only with a
+ * row-based model (chunk items into rows first, measure real row heights).
+ */
 export function VideoGrid({ items }: { items: VideoSummary[] }) {
-	const parent = useRef<HTMLDivElement>(null);
-	const row = useVirtualizer({
-		count: items.length,
-		getScrollElement: () => parent.current,
-		estimateSize: () => 240,
-		overscan: 6,
-	});
 	return (
-		<div ref={parent} className="h-full overflow-auto p-4">
-			<div style={{ height: row.getTotalSize(), position: "relative" }}>
-				{row.getVirtualItems().map((v) => (
-					<div
-						key={v.key}
-						style={{
-							position: "absolute",
-							top: v.start,
-							left: 0,
-							right: 0,
-						}}
-						className="px-1"
-					>
-						<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-							{items
-								.slice(v.index, v.index + 4)
-								.map((it) => (
-									<VideoCard key={it.id} v={it} />
-								))}
-						</div>
-					</div>
-				))}
-			</div>
+		<div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-4 gap-y-6 p-4">
+			{items.map((it) => (
+				<VideoCard key={it.id} v={it} />
+			))}
 		</div>
 	);
 }

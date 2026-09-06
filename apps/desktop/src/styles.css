@@ -2,10 +2,66 @@
 @tailwind components;
 @tailwind utilities;
 
+/* yoube redesign v2 tokens (mirrors docs/design/yoube.fig) */
+:root {
+	--yoube-bg: #0a0a0b;
+	--yoube-surface: #141417;
+	--yoube-surface-2: #1c1c21;
+	--yoube-border: #26262c;
+	--yoube-text: #f4f4f5;
+	--yoube-muted: #a1a1aa;
+	--yoube-faint: #63636b;
+	--yoube-accent: #e62117;
+	--yoube-accent-hover: #f03428;
+}
+
 html,
 body,
 #root {
 	height: 100%;
-	background: #0f0f0f;
-	color: #f1f1f1;
+	background: var(--yoube-bg);
+	color: var(--yoube-text);
+}
+
+/* Slim dark scrollbars */
+* {
+	scrollbar-width: thin;
+	scrollbar-color: #3f3f46 transparent;
+}
+*::-webkit-scrollbar {
+	width: 8px;
+	height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+	background: #3f3f46;
+	border-radius: 8px;
+}
+*::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+/* Skeleton shimmer */
+@keyframes yoube-shimmer {
+	0% {
+		background-position: -400px 0;
+	}
+	100% {
+		background-position: 400px 0;
+	}
+}
+.yoube-skeleton {
+	background: linear-gradient(
+		90deg,
+		var(--yoube-surface-2) 25%,
+		#26262e 50%,
+		var(--yoube-surface-2) 75%
+	);
+	background-size: 800px 100%;
+	animation: yoube-shimmer 1.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.yoube-skeleton {
+		animation: none;
+	}
 }

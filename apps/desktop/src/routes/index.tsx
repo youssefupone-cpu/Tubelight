@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { trending, Region } from "@yoube/contracts";
+import { Region, trending } from "@yoube/contracts";
+import { VideoGridSkeleton } from "../components/VideoCard";
 import { VideoGrid } from "../components/VideoGrid";
 
 export const Route = createFileRoute("/")({ component: Home });
@@ -10,7 +11,17 @@ function Home() {
 		queryKey: ["trending", Region.US],
 		queryFn: () => trending(Region.US),
 	});
-	if (q.isPending) return <div className="p-4">Loading…</div>;
+	if (q.isPending) return <VideoGridSkeleton count={8} />;
 	if (q.error) return <div className="p-4 text-red-400">{String(q.error)}</div>;
-	return <VideoGrid items={q.data} />;
+	return (
+		<div className="h-full overflow-auto">
+			<div className="flex items-baseline gap-3 px-4 pt-4">
+				<h1 className="text-lg font-bold">Trending</h1>
+				<span className="text-xs text-neutral-500">
+					United States · updated hourly
+				</span>
+			</div>
+			<VideoGrid items={q.data} />
+		</div>
+	);
 }
