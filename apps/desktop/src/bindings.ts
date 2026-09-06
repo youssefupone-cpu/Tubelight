@@ -333,3 +333,23 @@ export function filter_segments_for(_video_id: string): Promise<Segment[]> {
 export function filter_branding_for(_video_id: string): Promise<Branding> {
 	return Promise.resolve({ title: null, thumbnail_url: null });
 }
+
+// --- DnsBlockService contracts (Task 4.3) ---
+// Hand-stubbed mirroring crates/yoube-core/src/services/dns.rs.
+// Replaced by tauri-specta typegen on machines with the GTK stack.
+
+export function dns_install(): Promise<number> {
+	return Promise.resolve(0);
+}
+
+export function dns_uninstall(): Promise<void> {
+	return Promise.resolve();
+}
+
+export function dns_status(): Promise<string> {
+	return Promise.resolve("not_installed");
+}
+
+export function dns_refresh(): Promise<number> {
+	return Promise.resolve(0);
+}

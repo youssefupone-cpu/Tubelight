@@ -2,6 +2,7 @@ use std::sync::Arc;
 
 use yoube_core::AppContext;
 use yoube_core::services::account::StorageAccountService;
+use yoube_core::services::dns::AppDnsBlockService;
 use yoube_core::services::downloader::YtDlpDownloaderService;
 use yoube_core::services::filter::AppFilterService;
 use yoube_core::services::youtube::YtDlpYoutubeService;
@@ -50,8 +51,11 @@ pub fn run() {
                 Ok::<_, yoube_core::AppError>(s)
             })?;
             let account = Arc::new(StorageAccountService::new(storage));
+            let dnsblock = Arc::new(AppDnsBlockService::production(
+                data_dir.join("backups"),
+            )?);
 
-            let ctx = AppContext::new(youtube, account, downloader, filter);
+            let ctx = AppContext::new(youtube, account, downloader, filter, dnsblock);
             app.manage(ctx);
             Ok(())
         })
@@ -89,7 +93,11 @@ pub fn run() {
             commands::filter_init,
             commands::filter_matches,
             commands::filter_segments_for,
-            commands::filter_branding_for
+            commands::filter_branding_for,
+            commands::dns_install,
+            commands::dns_uninstall,
+            commands::dns_status,
+            commands::dns_refresh
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

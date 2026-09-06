@@ -2,6 +2,7 @@ use std::sync::Arc;
 
 use crate::error::AppResult;
 use crate::services::account::AccountService;
+use crate::services::dns::DnsBlockService;
 use crate::services::downloader::DownloaderService;
 use crate::services::filter::FilterService;
 use crate::services::youtube::YoutubeService;
@@ -11,6 +12,7 @@ pub struct AppContext {
     pub account: Arc<dyn AccountService>,
     pub downloader: Arc<dyn DownloaderService>,
     pub filter: Arc<dyn FilterService>,
+    pub dnsblock: Arc<dyn DnsBlockService>,
 }
 
 impl AppContext {
@@ -19,12 +21,14 @@ impl AppContext {
         account: Arc<dyn AccountService>,
         downloader: Arc<dyn DownloaderService>,
         filter: Arc<dyn FilterService>,
+        dnsblock: Arc<dyn DnsBlockService>,
     ) -> Self {
         Self {
             youtube,
             account,
             downloader,
             filter,
+            dnsblock,
         }
     }
     pub fn ping(&self) -> AppResult<&'static str> {
@@ -186,6 +190,23 @@ mod tests {
         }
     }
 
+    struct NoopDnsBlockService;
+    #[async_trait::async_trait]
+    impl crate::services::dns::DnsBlockService for NoopDnsBlockService {
+        async fn install(&self) -> AppResult<usize> {
+            Err(crate::error::AppError::Internal(anyhow::anyhow!("noop")))
+        }
+        async fn uninstall(&self) -> AppResult<()> {
+            Err(crate::error::AppError::Internal(anyhow::anyhow!("noop")))
+        }
+        async fn status(&self) -> AppResult<String> {
+            Err(crate::error::AppError::Internal(anyhow::anyhow!("noop")))
+        }
+        async fn refresh(&self) -> AppResult<usize> {
+            Err(crate::error::AppError::Internal(anyhow::anyhow!("noop")))
+        }
+    }
+
     #[test]
     fn new_context_pings() {
         let ctx = AppContext::new(
@@ -193,6 +214,7 @@ mod tests {
             Arc::new(NoopAccountService),
             Arc::new(NoopDownloaderService),
             Arc::new(NoopFilterService),
+            Arc::new(NoopDnsBlockService),
         );
         assert_eq!(ctx.ping().unwrap(), "pong");
     }

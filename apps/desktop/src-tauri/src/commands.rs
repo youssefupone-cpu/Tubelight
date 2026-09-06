@@ -230,3 +230,27 @@ pub async fn filter_branding_for(
 ) -> Result<yoube_filter::Branding, AppError> {
     ctx.filter.branding_for(&video_id).await
 }
+
+#[tauri::command]
+// #[specta::specta]
+pub async fn dns_install(ctx: State<'_, AppContext>) -> Result<usize, AppError> {
+    ctx.dnsblock.install().await
+}
+
+#[tauri::command]
+// #[specta::specta]
+pub async fn dns_uninstall(ctx: State<'_, AppContext>) -> Result<(), AppError> {
+    ctx.dnsblock.uninstall().await
+}
+
+#[tauri::command]
+// #[specta::specta]
+pub async fn dns_status(ctx: State<'_, AppContext>) -> Result<String, AppError> {
+    ctx.dnsblock.status().await
+}
+
+#[tauri::command]
+// #[specta::specta]
+pub async fn dns_refresh(ctx: State<'_, AppContext>) -> Result<usize, AppError> {
+    ctx.dnsblock.refresh().await
+}

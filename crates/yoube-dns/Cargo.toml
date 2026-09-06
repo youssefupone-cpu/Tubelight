@@ -3,3 +3,12 @@ name = "yoube-dns"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
+
+[dependencies]
+yoube-error = { path = "../yoube-error" }
+anyhow = { workspace = true }
+reqwest = { workspace = true }
+tokio = { workspace = true }
+
+[dev-dependencies]
+tempfile = "3"
