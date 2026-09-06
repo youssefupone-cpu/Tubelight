@@ -2,6 +2,7 @@ use std::sync::Arc;
 
 use yoube_core::AppContext;
 use yoube_core::services::account::StorageAccountService;
+use yoube_core::services::downloader::YtDlpDownloaderService;
 use yoube_core::services::youtube::YtDlpYoutubeService;
 use yoube_storage::Storage;
 use yoube_yt_dlp::runner::TokioCommandRunner;
@@ -21,21 +22,27 @@ pub fn run() {
         .setup(|app| {
             let bin = crate::sidecar::yt_dlp_path(app.handle());
             let ytdlp = YtDlp::new(bin, Arc::new(TokioCommandRunner));
-            let youtube = Arc::new(YtDlpYoutubeService { ytdlp });
+            let youtube = Arc::new(YtDlpYoutubeService {
+                ytdlp: ytdlp.clone(),
+            });
+            let downloader =
+                Arc::new(YtDlpDownloaderService::new(ytdlp));
 
             // Resolve the per-user data directory then open (or create) the DB.
-            // `app.path().data_dir()` returns `$HOME/.local/share/yoube` on
-            // Linux / `%APPDATA%\yoube` on Windows — exactly the XDG path the
-            // storage layer expects. The directory is created lazily by
-            // `Storage::open` via `create_if_missing`.
+            // `setup` is synchronous, so drive the async storage init with the
+            // Tauri async runtime (`block_on`); `Storage::open` itself is fast
+            // (pool creation, no I/O beyond file creation).
             let data_dir = app.path().data_dir().join("yoube");
             std::fs::create_dir_all(&data_dir)?;
             let db_path = data_dir.join("yoube.db");
-            let storage = Storage::open(&db_path).await?;
-            storage.migrate().await?;
+            let storage = tauri::async_runtime::block_on(async {
+                let s = Storage::open(&db_path).await?;
+                s.migrate().await?;
+                Ok::<_, yoube_core::AppError>(s)
+            })?;
             let account = Arc::new(StorageAccountService::new(storage));
 
-            let ctx = AppContext::new(youtube, account);
+            let ctx = AppContext::new(youtube, account, downloader);
             app.manage(ctx);
             Ok(())
         })
@@ -63,7 +70,13 @@ pub fn run() {
             commands::history_clear,
             commands::like,
             commands::unlike,
-            commands::watch_later
+            commands::watch_later,
+            commands::list_formats,
+            commands::download_enqueue,
+            commands::download_pause,
+            commands::download_resume,
+            commands::download_cancel,
+            commands::download_list
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

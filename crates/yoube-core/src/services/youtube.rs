@@ -1,8 +1,8 @@
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
-use yoube_yt_dlp::parser::{parse_dump_json, parse_list_formats};
 use yoube_yt_dlp::YtDlp;
 use yoube_yt_dlp::model::{Format, VideoSummary};
+use yoube_yt_dlp::parser::{parse_dump_json, parse_list_formats};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[cfg_attr(feature = "specta", derive(specta::Type))]
@@ -186,10 +186,15 @@ impl YoutubeService for YtDlpYoutubeService {
         })
     }
     async fn trending(&self, region: Region) -> yoube_core::AppResult<Vec<VideoSummary>> {
-        self.flat_list(&format!("https://www.youtube.com/feed/trending?gl={}", region.code())).await
+        self.flat_list(&format!(
+            "https://www.youtube.com/feed/trending?gl={}",
+            region.code()
+        ))
+        .await
     }
     async fn related(&self, id: &str) -> yoube_core::AppResult<Vec<VideoSummary>> {
-        self.flat_list(&format!("https://www.youtube.com/watch?v={id}")).await
+        self.flat_list(&format!("https://www.youtube.com/watch?v={id}"))
+            .await
     }
 }
 

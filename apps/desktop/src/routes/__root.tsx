@@ -17,6 +17,18 @@ export const Route = createRootRoute({
 				<Link to="/users" className="text-sm text-neutral-400 hover:text-white">
 					Users
 				</Link>
+				<Link
+					to="/downloads"
+					className="text-sm text-neutral-400 hover:text-white"
+				>
+					Downloads
+				</Link>
+				<Link
+					to="/settings"
+					className="text-sm text-neutral-400 hover:text-white"
+				>
+					Settings
+				</Link>
 			</header>
 			<main className="flex-1 min-h-0">
 				<Outlet />

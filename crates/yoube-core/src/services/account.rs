@@ -68,8 +68,12 @@ pub trait AccountService: Send + Sync {
     async fn create_user(&self, name: &str) -> AppResult<UserProfile>;
     async fn delete_user(&self, id: i64) -> AppResult<()>;
     async fn subscriptions(&self) -> AppResult<Vec<ChannelRef>>;
-    async fn subscribe(&self, channel_id: &str, title: &str, thumb_url: Option<&str>)
-        -> AppResult<()>;
+    async fn subscribe(
+        &self,
+        channel_id: &str,
+        title: &str,
+        thumb_url: Option<&str>,
+    ) -> AppResult<()>;
     async fn unsubscribe(&self, channel_id: &str) -> AppResult<()>;
     async fn playlists(&self) -> AppResult<Vec<Playlist>>;
     async fn playlist_items(&self, id: i64) -> AppResult<Vec<VideoSummary>>;
@@ -148,11 +152,14 @@ impl AccountService for StorageAccountService {
     async fn subscriptions(&self) -> AppResult<Vec<ChannelRef>> {
         let uid = self.ensure_current().await?;
         let subs = sub_mod::list(&self.storage, uid).await?;
-        Ok(subs.into_iter().map(|s| ChannelRef {
-            id: s.channel_id,
-            title: s.title,
-            thumb_url: s.thumb_url,
-        }).collect())
+        Ok(subs
+            .into_iter()
+            .map(|s| ChannelRef {
+                id: s.channel_id,
+                title: s.title,
+                thumb_url: s.thumb_url,
+            })
+            .collect())
     }
 
     async fn subscribe(
@@ -204,16 +211,19 @@ impl AccountService for StorageAccountService {
 
     async fn playlist_items(&self, id: i64) -> AppResult<Vec<VideoSummary>> {
         let items = pl_mod::items(&self.storage, id).await?;
-        Ok(items.into_iter().map(|it| VideoSummary {
-            id: it.video_id,
-            title: it.title,
-            channel_id: it.channel_id.unwrap_or_default(),
-            channel_title: it.channel_title.unwrap_or_default(),
-            duration_s: it.duration_s.map(|n| n as u32),
-            view_count: None,
-            upload_date: None,
-            thumbnail_url: it.thumb_url,
-        }).collect())
+        Ok(items
+            .into_iter()
+            .map(|it| VideoSummary {
+                id: it.video_id,
+                title: it.title,
+                channel_id: it.channel_id.unwrap_or_default(),
+                channel_title: it.channel_title.unwrap_or_default(),
+                duration_s: it.duration_s.map(|n| n as u32),
+                view_count: None,
+                upload_date: None,
+                thumbnail_url: it.thumb_url,
+            })
+            .collect())
     }
 
     async fn playlist_add(&self, id: i64, video: &VideoSummary) -> AppResult<()> {
@@ -237,15 +247,18 @@ impl AccountService for StorageAccountService {
     async fn history(&self, page: u32) -> AppResult<Vec<HistoryEntryView>> {
         let uid = self.ensure_current().await?;
         let rows = hist_mod::list(&self.storage, uid, page).await?;
-        Ok(rows.into_iter().map(|h| HistoryEntryView {
-            video_id: h.video_id,
-            title: h.title,
-            channel_title: h.channel_title,
-            duration_s: h.duration_s,
-            thumb_url: h.thumb_url,
-            watched_at: h.watched_at,
-            position_s: h.position_s,
-        }).collect())
+        Ok(rows
+            .into_iter()
+            .map(|h| HistoryEntryView {
+                video_id: h.video_id,
+                title: h.title,
+                channel_title: h.channel_title,
+                duration_s: h.duration_s,
+                thumb_url: h.thumb_url,
+                watched_at: h.watched_at,
+                position_s: h.position_s,
+            })
+            .collect())
     }
 
     async fn history_clear(&self) -> AppResult<()> {
@@ -357,13 +370,31 @@ impl AccountService for StorageAccountService {
                     let _ = self
                         .mark_history(&VideoSummary {
                             id: vid.to_string(),
-                            title: h.get("title").and_then(|t| t.as_str()).unwrap_or("").to_string(),
-                            channel_id: h.get("channel_id").and_then(|t| t.as_str()).unwrap_or_default().to_string(),
-                            channel_title: h.get("channel_title").and_then(|t| t.as_str()).unwrap_or_default().to_string(),
-                            duration_s: h.get("duration_s").and_then(|t| t.as_i64()).map(|n| n as u32),
+                            title: h
+                                .get("title")
+                                .and_then(|t| t.as_str())
+                                .unwrap_or("")
+                                .to_string(),
+                            channel_id: h
+                                .get("channel_id")
+                                .and_then(|t| t.as_str())
+                                .unwrap_or_default()
+                                .to_string(),
+                            channel_title: h
+                                .get("channel_title")
+                                .and_then(|t| t.as_str())
+                                .unwrap_or_default()
+                                .to_string(),
+                            duration_s: h
+                                .get("duration_s")
+                                .and_then(|t| t.as_i64())
+                                .map(|n| n as u32),
                             view_count: None,
                             upload_date: None,
-                            thumbnail_url: h.get("thumb_url").and_then(|t| t.as_str()).map(String::from),
+                            thumbnail_url: h
+                                .get("thumb_url")
+                                .and_then(|t| t.as_str())
+                                .map(String::from),
                         })
                         .await;
                 }
@@ -372,16 +403,36 @@ impl AccountService for StorageAccountService {
         if let Some(arr) = doc.get("likes").and_then(|v| v.as_array()) {
             for l in arr {
                 if let Some(vid) = l.get("video_id").and_then(|v| v.as_str()) {
-                    let _ = self.like(&VideoSummary {
-                        id: vid.to_string(),
-                        title: l.get("title").and_then(|t| t.as_str()).unwrap_or("").to_string(),
-                        channel_id: l.get("channel_id").and_then(|t| t.as_str()).unwrap_or_default().to_string(),
-                        channel_title: l.get("channel_title").and_then(|t| t.as_str()).unwrap_or_default().to_string(),
-                        duration_s: l.get("duration_s").and_then(|t| t.as_i64()).map(|n| n as u32),
-                        view_count: None,
-                        upload_date: None,
-                        thumbnail_url: l.get("thumb_url").and_then(|t| t.as_str()).map(String::from),
-                    }).await;
+                    let _ = self
+                        .like(&VideoSummary {
+                            id: vid.to_string(),
+                            title: l
+                                .get("title")
+                                .and_then(|t| t.as_str())
+                                .unwrap_or("")
+                                .to_string(),
+                            channel_id: l
+                                .get("channel_id")
+                                .and_then(|t| t.as_str())
+                                .unwrap_or_default()
+                                .to_string(),
+                            channel_title: l
+                                .get("channel_title")
+                                .and_then(|t| t.as_str())
+                                .unwrap_or_default()
+                                .to_string(),
+                            duration_s: l
+                                .get("duration_s")
+                                .and_then(|t| t.as_i64())
+                                .map(|n| n as u32),
+                            view_count: None,
+                            upload_date: None,
+                            thumbnail_url: l
+                                .get("thumb_url")
+                                .and_then(|t| t.as_str())
+                                .map(String::from),
+                        })
+                        .await;
                 }
             }
         }

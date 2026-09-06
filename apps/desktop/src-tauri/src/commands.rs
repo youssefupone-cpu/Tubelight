@@ -141,3 +141,51 @@ pub async fn unlike(ctx: State<'_, AppContext>, video_id: String) -> Result<(), 
 pub async fn watch_later(ctx: State<'_, AppContext>, video: VideoSummary) -> Result<(), AppError> {
     ctx.account.watch_later(&video).await
 }
+
+#[tauri::command]
+// #[specta::specta]
+pub async fn list_formats(
+    ctx: State<'_, AppContext>,
+    video_id: String,
+) -> Result<Vec<yoube_yt_dlp::model::Format>, AppError> {
+    ctx.downloader.list_formats(&video_id).await
+}
+
+#[tauri::command]
+// #[specta::specta]
+pub async fn download_enqueue(
+    ctx: State<'_, AppContext>,
+    video_id: String,
+    format_id: String,
+    dest_dir: String,
+) -> Result<u64, AppError> {
+    ctx.downloader
+        .enqueue(&video_id, &format_id, std::path::Path::new(&dest_dir))
+        .await
+}
+
+#[tauri::command]
+// #[specta::specta]
+pub async fn download_pause(ctx: State<'_, AppContext>, id: u64) -> Result<(), AppError> {
+    ctx.downloader.pause(id).await
+}
+
+#[tauri::command]
+// #[specta::specta]
+pub async fn download_resume(ctx: State<'_, AppContext>, id: u64) -> Result<(), AppError> {
+    ctx.downloader.resume(id).await
+}
+
+#[tauri::command]
+// #[specta::specta]
+pub async fn download_cancel(ctx: State<'_, AppContext>, id: u64) -> Result<(), AppError> {
+    ctx.downloader.cancel(id).await
+}
+
+#[tauri::command]
+// #[specta::specta]
+pub async fn download_list(
+    ctx: State<'_, AppContext>,
+) -> Result<Vec<yoube_yt_dlp::downloader::Job>, AppError> {
+    ctx.downloader.list_jobs().await
+}

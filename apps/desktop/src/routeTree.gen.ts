@@ -10,8 +10,10 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DownloadsRouteImport } from './routes/downloads'
 import { Route as LibraryRouteImport } from './routes/library'
 import { Route as ResultsRouteImport } from './routes/results'
+import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as UsersRouteImport } from './routes/users'
 import { Route as WatchRouteImport } from './routes/watch'
 import { Route as ChannelIdRouteImport } from './routes/channel.$id'
@@ -25,6 +27,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DownloadsRoute = DownloadsRouteImport.update({
+  id: '/downloads',
+  path: '/downloads',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LibraryRoute = LibraryRouteImport.update({
   id: '/library',
   path: '/library',
@@ -33,6 +40,11 @@ const LibraryRoute = LibraryRouteImport.update({
 const ResultsRoute = ResultsRouteImport.update({
   id: '/results',
   path: '/results',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
 const UsersRoute = UsersRouteImport.update({
@@ -73,8 +85,10 @@ const FeedWatchLaterRoute = FeedWatchLaterRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/downloads': typeof DownloadsRoute
   '/library': typeof LibraryRoute
   '/results': typeof ResultsRoute
+  '/settings': typeof SettingsRoute
   '/users': typeof UsersRoute
   '/watch': typeof WatchRoute
   '/channel/$id': typeof ChannelIdRoute
@@ -85,8 +99,10 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/downloads': typeof DownloadsRoute
   '/library': typeof LibraryRoute
   '/results': typeof ResultsRoute
+  '/settings': typeof SettingsRoute
   '/users': typeof UsersRoute
   '/watch': typeof WatchRoute
   '/channel/$id': typeof ChannelIdRoute
@@ -98,8 +114,10 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/downloads': typeof DownloadsRoute
   '/library': typeof LibraryRoute
   '/results': typeof ResultsRoute
+  '/settings': typeof SettingsRoute
   '/users': typeof UsersRoute
   '/watch': typeof WatchRoute
   '/channel/$id': typeof ChannelIdRoute
@@ -112,8 +130,10 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/downloads'
     | '/library'
     | '/results'
+    | '/settings'
     | '/users'
     | '/watch'
     | '/channel/$id'
@@ -124,8 +144,10 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/downloads'
     | '/library'
     | '/results'
+    | '/settings'
     | '/users'
     | '/watch'
     | '/channel/$id'
@@ -136,8 +158,10 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/downloads'
     | '/library'
     | '/results'
+    | '/settings'
     | '/users'
     | '/watch'
     | '/channel/$id'
@@ -149,8 +173,10 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DownloadsRoute: typeof DownloadsRoute
   LibraryRoute: typeof LibraryRoute
   ResultsRoute: typeof ResultsRoute
+  SettingsRoute: typeof SettingsRoute
   UsersRoute: typeof UsersRoute
   WatchRoute: typeof WatchRoute
   ChannelIdRoute: typeof ChannelIdRoute
@@ -169,6 +195,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/downloads': {
+      id: '/downloads'
+      path: '/downloads'
+      fullPath: '/downloads'
+      preLoaderRoute: typeof DownloadsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/library': {
       id: '/library'
       path: '/library'
@@ -181,6 +214,13 @@ declare module '@tanstack/react-router' {
       path: '/results'
       fullPath: '/results'
       preLoaderRoute: typeof ResultsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/users': {
@@ -237,8 +277,10 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DownloadsRoute: DownloadsRoute,
   LibraryRoute: LibraryRoute,
   ResultsRoute: ResultsRoute,
+  SettingsRoute: SettingsRoute,
   UsersRoute: UsersRoute,
   WatchRoute: WatchRoute,
   ChannelIdRoute: ChannelIdRoute,

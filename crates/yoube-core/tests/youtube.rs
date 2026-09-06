@@ -47,7 +47,10 @@ async fn search_uses_flat_playlist_fixture() {
     assert!(!results.is_empty());
     assert_eq!(results.len(), 3);
     assert_eq!(results[0].id, "9fYVNmBjRUs");
-    assert_eq!(results[0].title, "Rust Programming Tutorial #1 - What is Rust?");
+    assert_eq!(
+        results[0].title,
+        "Rust Programming Tutorial #1 - What is Rust?"
+    );
     assert_eq!(results[0].channel_id, "UCWs0E4Ig_ZtCi5mfu5oyYUzA");
     assert_eq!(results[0].channel_title, "freeCodeCamp.org");
     assert_eq!(results[0].view_count, Some(3200000));

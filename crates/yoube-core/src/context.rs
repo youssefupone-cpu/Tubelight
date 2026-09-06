@@ -2,16 +2,26 @@ use std::sync::Arc;
 
 use crate::error::AppResult;
 use crate::services::account::AccountService;
+use crate::services::downloader::DownloaderService;
 use crate::services::youtube::YoutubeService;
 
 pub struct AppContext {
     pub youtube: Arc<dyn YoutubeService>,
     pub account: Arc<dyn AccountService>,
+    pub downloader: Arc<dyn DownloaderService>,
 }
 
 impl AppContext {
-    pub fn new(youtube: Arc<dyn YoutubeService>, account: Arc<dyn AccountService>) -> Self {
-        Self { youtube, account }
+    pub fn new(
+        youtube: Arc<dyn YoutubeService>,
+        account: Arc<dyn AccountService>,
+        downloader: Arc<dyn DownloaderService>,
+    ) -> Self {
+        Self {
+            youtube,
+            account,
+            downloader,
+        }
     }
     pub fn ping(&self) -> AppResult<&'static str> {
         Ok("pong")
@@ -87,16 +97,26 @@ mod tests {
         async fn playlists(&self) -> AppResult<Vec<crate::AccountPlaylist>> {
             Err(crate::error::AppError::Internal(anyhow::anyhow!("noop")))
         }
-        async fn playlist_items(&self, _: i64) -> AppResult<Vec<yoube_yt_dlp::model::VideoSummary>> {
+        async fn playlist_items(
+            &self,
+            _: i64,
+        ) -> AppResult<Vec<yoube_yt_dlp::model::VideoSummary>> {
             Err(crate::error::AppError::Internal(anyhow::anyhow!("noop")))
         }
-        async fn playlist_add(&self, _: i64, _: &yoube_yt_dlp::model::VideoSummary) -> AppResult<()> {
+        async fn playlist_add(
+            &self,
+            _: i64,
+            _: &yoube_yt_dlp::model::VideoSummary,
+        ) -> AppResult<()> {
             Err(crate::error::AppError::Internal(anyhow::anyhow!("noop")))
         }
         async fn playlist_remove(&self, _: i64, _: &str) -> AppResult<()> {
             Err(crate::error::AppError::Internal(anyhow::anyhow!("noop")))
         }
-        async fn history(&self, _: u32) -> AppResult<Vec<crate::services::account::HistoryEntryView>> {
+        async fn history(
+            &self,
+            _: u32,
+        ) -> AppResult<Vec<crate::services::account::HistoryEntryView>> {
             Err(crate::error::AppError::Internal(anyhow::anyhow!("noop")))
         }
         async fn history_clear(&self) -> AppResult<()> {
@@ -122,9 +142,36 @@ mod tests {
         }
     }
 
+    struct NoopDownloaderService;
+    #[async_trait::async_trait]
+    impl crate::services::downloader::DownloaderService for NoopDownloaderService {
+        async fn list_formats(&self, _: &str) -> AppResult<Vec<yoube_yt_dlp::model::Format>> {
+            Err(crate::error::AppError::Internal(anyhow::anyhow!("noop")))
+        }
+        async fn enqueue(&self, _: &str, _: &str, _: &std::path::Path) -> AppResult<u64> {
+            Err(crate::error::AppError::Internal(anyhow::anyhow!("noop")))
+        }
+        async fn pause(&self, _: u64) -> AppResult<()> {
+            Err(crate::error::AppError::Internal(anyhow::anyhow!("noop")))
+        }
+        async fn resume(&self, _: u64) -> AppResult<()> {
+            Err(crate::error::AppError::Internal(anyhow::anyhow!("noop")))
+        }
+        async fn cancel(&self, _: u64) -> AppResult<()> {
+            Err(crate::error::AppError::Internal(anyhow::anyhow!("noop")))
+        }
+        async fn list_jobs(&self) -> AppResult<Vec<yoube_yt_dlp::downloader::Job>> {
+            Err(crate::error::AppError::Internal(anyhow::anyhow!("noop")))
+        }
+    }
+
     #[test]
     fn new_context_pings() {
-        let ctx = AppContext::new(Arc::new(NoopYoutubeService), Arc::new(NoopAccountService));
+        let ctx = AppContext::new(
+            Arc::new(NoopYoutubeService),
+            Arc::new(NoopAccountService),
+            Arc::new(NoopDownloaderService),
+        );
         assert_eq!(ctx.ping().unwrap(), "pong");
     }
 }

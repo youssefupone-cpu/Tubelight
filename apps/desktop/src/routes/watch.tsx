@@ -1,6 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useSearch } from "@tanstack/react-router";
 import { get_video, related } from "@yoube/contracts";
+import { useState } from "react";
+import { FormatPicker } from "../components/FormatPicker";
 import { Player } from "../components/Player";
 import { VideoCard } from "../components/VideoCard";
 
@@ -13,6 +15,7 @@ export const Route = createFileRoute("/watch")({
 
 function Watch() {
 	const { v } = useSearch({ from: "/watch" });
+	const [pickerOpen, setPickerOpen] = useState(false);
 	const vid = useQuery({
 		queryKey: ["video", v],
 		queryFn: () => get_video(v),
@@ -24,12 +27,11 @@ function Watch() {
 		enabled: !!v,
 	});
 	if (vid.isPending) return <div className="p-4">Loading…</div>;
-	if (vid.error) return <div className="p-4 text-red-400">{String(vid.error)}</div>;
+	if (vid.error)
+		return <div className="p-4 text-red-400">{String(vid.error)}</div>;
 	const best =
 		vid.data.formats.find(
-			(f) =>
-				(f.vcodec ?? "none") !== "none" &&
-				(f.acodec ?? "none") !== "none",
+			(f) => (f.vcodec ?? "none") !== "none" && (f.acodec ?? "none") !== "none",
 		) ?? vid.data.formats[0];
 	return (
 		<div className="h-full overflow-auto p-4 grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6">
@@ -44,6 +46,21 @@ function Watch() {
 				<div className="text-sm text-neutral-400">
 					{vid.data.summary.channel_title}
 				</div>
+				<div className="mt-2">
+					<button
+						type="button"
+						onClick={() => setPickerOpen(true)}
+						className="rounded-full bg-white px-4 py-1.5 text-sm font-medium text-black hover:bg-neutral-200"
+					>
+						Download
+					</button>
+				</div>
+				<FormatPicker
+					videoId={v}
+					videoTitle={vid.data.summary.title}
+					open={pickerOpen}
+					onClose={() => setPickerOpen(false)}
+				/>
 			</div>
 			<aside>
 				<h2 className="font-semibold mb-2">Related</h2>

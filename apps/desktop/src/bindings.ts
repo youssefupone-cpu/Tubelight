@@ -6,108 +6,111 @@
 export type AppError = string;
 
 export interface PingResponse {
-  value: string;
+	value: string;
 }
 
 export interface VideoSummary {
-  id: string;
-  title: string;
-  channel_id: string;
-  channel_title: string;
-  duration_s?: number | null;
-  view_count?: number | null;
-  upload_date?: string | null;
-  thumbnail_url?: string | null;
+	id: string;
+	title: string;
+	channel_id: string;
+	channel_title: string;
+	duration_s?: number | null;
+	view_count?: number | null;
+	upload_date?: string | null;
+	thumbnail_url?: string | null;
 }
 
 export interface Format {
-  format_id: string;
-  ext: string;
-  url?: string | null;
-  resolution?: string | null;
-  fps?: number | null;
-  vcodec?: string | null;
-  acodec?: string | null;
-  filesize?: number | null;
-  tbr?: number | null;
-  note?: string | null;
+	format_id: string;
+	ext: string;
+	url?: string | null;
+	resolution?: string | null;
+	fps?: number | null;
+	vcodec?: string | null;
+	acodec?: string | null;
+	filesize?: number | null;
+	tbr?: number | null;
+	note?: string | null;
 }
 
 export interface Video {
-  summary: VideoSummary;
-  formats: Format[];
+	summary: VideoSummary;
+	formats: Format[];
 }
 
 export interface Channel {
-  id: string;
-  title: string;
-  description: string;
-  thumb_url: string | null;
+	id: string;
+	title: string;
+	description: string;
+	thumb_url: string | null;
 }
 
 export interface Playlist {
-  id: string;
-  title: string;
-  channel_id: string;
-  items: VideoSummary[];
+	id: string;
+	title: string;
+	channel_id: string;
+	items: VideoSummary[];
 }
 
 export enum Region {
-  US,
-  GB,
-  EG,
-  SA,
-  DE,
-  FR,
-  JP,
-  BR,
-  IN,
-  AU,
-  CA,
-  MX,
-  ES,
-  IT,
-  RU,
-  TR,
-  ZA,
-  NG,
-  KR,
-  AR,
+	US = 0,
+	GB = 1,
+	EG = 2,
+	SA = 3,
+	DE = 4,
+	FR = 5,
+	JP = 6,
+	BR = 7,
+	IN = 8,
+	AU = 9,
+	CA = 10,
+	MX = 11,
+	ES = 12,
+	IT = 13,
+	RU = 14,
+	TR = 15,
+	ZA = 16,
+	NG = 17,
+	KR = 18,
+	AR = 19,
 }
 
 export function ping(): Promise<PingResponse> {
-  return Promise.resolve({ value: "pong" });
+	return Promise.resolve({ value: "pong" });
 }
 
 export function get_video(v: string): Promise<Video> {
-  return Promise.resolve({
-    summary: { id: v, title: "", channel_id: "", channel_title: "" },
-    formats: [],
-  });
+	return Promise.resolve({
+		summary: { id: v, title: "", channel_id: "", channel_title: "" },
+		formats: [],
+	});
 }
 
 export function related(_v: string): Promise<VideoSummary[]> {
-  return Promise.resolve([]);
+	return Promise.resolve([]);
 }
 
 export function search(_q: string, _page: number): Promise<VideoSummary[]> {
-  return Promise.resolve([]);
+	return Promise.resolve([]);
 }
 
 export function channel(id: string): Promise<Channel> {
-  return Promise.resolve({ id, title: "", description: "", thumb_url: null });
+	return Promise.resolve({ id, title: "", description: "", thumb_url: null });
 }
 
-export function channel_videos(_id: string, _page: number): Promise<VideoSummary[]> {
-  return Promise.resolve([]);
+export function channel_videos(
+	_id: string,
+	_page: number,
+): Promise<VideoSummary[]> {
+	return Promise.resolve([]);
 }
 
 export function playlist(id: string): Promise<Playlist> {
-  return Promise.resolve({ id, title: "", channel_id: "", items: [] });
+	return Promise.resolve({ id, title: "", channel_id: "", items: [] });
 }
 
 export function trending(_region: Region): Promise<VideoSummary[]> {
-  return Promise.resolve([]);
+	return Promise.resolve([]);
 }
 
 // --- AccountService contracts (Task 2.2) ---
@@ -115,108 +118,171 @@ export function trending(_region: Region): Promise<VideoSummary[]> {
 // Replaced by tauri-specta typegen on machines with the GTK stack.
 
 export interface UserProfile {
-  id: number;
-  name: string;
-  avatar_path: string | null;
+	id: number;
+	name: string;
+	avatar_path: string | null;
 }
 
 export interface ChannelRef {
-  id: string;
-  title: string;
-  thumb_url: string | null;
+	id: string;
+	title: string;
+	thumb_url: string | null;
 }
 
 export interface AccountPlaylist {
-  id: number;
-  title: string;
-  description: string | null;
-  is_watch_later: boolean;
-  is_liked: boolean;
-  count: number;
+	id: number;
+	title: string;
+	description: string | null;
+	is_watch_later: boolean;
+	is_liked: boolean;
+	count: number;
 }
 
 export interface HistoryEntryView {
-  video_id: string;
-  title: string;
-  channel_title: string | null;
-  duration_s: number | null;
-  thumb_url: string | null;
-  watched_at: string;
-  position_s: number;
+	video_id: string;
+	title: string;
+	channel_title: string | null;
+	duration_s: number | null;
+	thumb_url: string | null;
+	watched_at: string;
+	position_s: number;
 }
 
 export function current_user(): Promise<UserProfile> {
-  return Promise.resolve({ id: 1, name: "yoube", avatar_path: null });
+	return Promise.resolve({ id: 1, name: "yoube", avatar_path: null });
 }
 
 export function switch_user(_id: number): Promise<void> {
-  return Promise.resolve();
+	return Promise.resolve();
 }
 
 export function create_user(name: string): Promise<UserProfile> {
-  return Promise.resolve({ id: 1, name, avatar_path: null });
+	return Promise.resolve({ id: 1, name, avatar_path: null });
 }
 
 export function delete_user(_id: number): Promise<void> {
-  return Promise.resolve();
+	return Promise.resolve();
 }
 
 export function subscriptions(): Promise<ChannelRef[]> {
-  return Promise.resolve([]);
+	return Promise.resolve([]);
 }
 
 export function subscribe(
-  _channel_id: string,
-  _title: string,
-  _thumb_url?: string | null,
+	_channel_id: string,
+	_title: string,
+	_thumb_url?: string | null,
 ): Promise<void> {
-  return Promise.resolve();
+	return Promise.resolve();
 }
 
 export function unsubscribe(_channel_id: string): Promise<void> {
-  return Promise.resolve();
+	return Promise.resolve();
 }
 
 export function playlists(): Promise<AccountPlaylist[]> {
-  return Promise.resolve([]);
+	return Promise.resolve([]);
 }
 
 export function playlist_items(_id: number): Promise<VideoSummary[]> {
-  return Promise.resolve([]);
+	return Promise.resolve([]);
 }
 
 export function playlist_add(_id: number, _video: VideoSummary): Promise<void> {
-  return Promise.resolve();
+	return Promise.resolve();
 }
 
 export function playlist_remove(_id: number, _video_id: string): Promise<void> {
-  return Promise.resolve();
+	return Promise.resolve();
 }
 
 export function history(_page: number): Promise<HistoryEntryView[]> {
-  return Promise.resolve([]);
+	return Promise.resolve([]);
 }
 
 export function history_clear(): Promise<void> {
-  return Promise.resolve();
+	return Promise.resolve();
 }
 
 export function like(_video: VideoSummary): Promise<void> {
-  return Promise.resolve();
+	return Promise.resolve();
 }
 
 export function unlike(_video_id: string): Promise<void> {
-  return Promise.resolve();
+	return Promise.resolve();
 }
 
 export function watch_later(_video: VideoSummary): Promise<void> {
-  return Promise.resolve();
+	return Promise.resolve();
 }
 
 export function export_account(_dest: string): Promise<void> {
-  return Promise.resolve();
+	return Promise.resolve();
 }
 
 export function import_account(_src: string): Promise<void> {
-  return Promise.resolve();
+	return Promise.resolve();
+}
+
+// --- DownloaderService contracts (Task 3.2) ---
+// Hand-stubbed mirroring crates/yoube-core/src/services/downloader.rs +
+// yoube-yt-dlp/src/downloader.rs. Replaced by tauri-specta typegen on
+// machines with the GTK stack.
+
+export type JobState =
+	| "Queued"
+	| "Running"
+	| "Paused"
+	| "Done"
+	| "Failed"
+	| "Cancelled";
+
+export interface Job {
+	id: number;
+	video_id: string;
+	format_id: string;
+	dest_dir: string;
+	state: JobState;
+	progress_bytes: number;
+	total_bytes: number | null;
+	eta_s: number | null;
+	error: string | null;
+}
+
+export type DownloadEvent =
+	| {
+			kind: "progress";
+			id: number;
+			bytes: number;
+			total: number | null;
+			eta_s: number | null;
+	  }
+	| { kind: "state"; id: number; state: JobState; error: string | null };
+
+export function list_formats(_video_id: string): Promise<Format[]> {
+	return Promise.resolve([]);
+}
+
+export function download_enqueue(
+	_video_id: string,
+	_format_id: string,
+	_dest_dir: string,
+): Promise<number> {
+	return Promise.resolve(0);
+}
+
+export function download_pause(_id: number): Promise<void> {
+	return Promise.resolve();
+}
+
+export function download_resume(_id: number): Promise<void> {
+	return Promise.resolve();
+}
+
+export function download_cancel(_id: number): Promise<void> {
+	return Promise.resolve();
+}
+
+export function download_list(): Promise<Job[]> {
+	return Promise.resolve([]);
 }
