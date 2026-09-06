@@ -1,11 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
-import { createFileRoute, Link, useSearch } from "@tanstack/react-router";
+import {
+	Link,
+	Navigate,
+	createFileRoute,
+	useSearch,
+} from "@tanstack/react-router";
 import { playlists } from "@yoube/contracts";
-import { SubscriptionsFeed } from "./feed.subscriptions";
+import { cn } from "../lib/utils";
 import { HistoryFeed } from "./feed.history";
 import { LikedFeed } from "./feed.liked";
+import { SubscriptionsFeed } from "./feed.subscriptions";
 import { WatchLaterFeed } from "./feed.watch-later";
-import { cn } from "../lib/utils";
 
 export const Route = createFileRoute("/library")({
 	validateSearch: (search) => ({
@@ -81,8 +86,9 @@ function Library() {
 				{tab === "liked" && <LikedFeed />}
 				{tab === "watch-later" && <WatchLaterFeed />}
 				{tab === "playlists" && <PlaylistsView />}
-				{(tab === "downloads" || tab === "settings") && (
-					<div className="p-4 text-neutral-400">Coming soon</div>
+				{tab === "downloads" && <Navigate to="/downloads" />}
+				{tab === "settings" && (
+					<Navigate to="/settings" search={{ tab: "general" }} />
 				)}
 			</main>
 		</div>
