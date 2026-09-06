@@ -3,12 +3,14 @@ use std::sync::Arc;
 use crate::error::AppResult;
 use crate::services::account::AccountService;
 use crate::services::downloader::DownloaderService;
+use crate::services::filter::FilterService;
 use crate::services::youtube::YoutubeService;
 
 pub struct AppContext {
     pub youtube: Arc<dyn YoutubeService>,
     pub account: Arc<dyn AccountService>,
     pub downloader: Arc<dyn DownloaderService>,
+    pub filter: Arc<dyn FilterService>,
 }
 
 impl AppContext {
@@ -16,11 +18,13 @@ impl AppContext {
         youtube: Arc<dyn YoutubeService>,
         account: Arc<dyn AccountService>,
         downloader: Arc<dyn DownloaderService>,
+        filter: Arc<dyn FilterService>,
     ) -> Self {
         Self {
             youtube,
             account,
             downloader,
+            filter,
         }
     }
     pub fn ping(&self) -> AppResult<&'static str> {
@@ -165,12 +169,30 @@ mod tests {
         }
     }
 
+    struct NoopFilterService;
+    #[async_trait::async_trait]
+    impl crate::services::filter::FilterService for NoopFilterService {
+        async fn init(&self) -> AppResult<usize> {
+            Err(crate::error::AppError::Internal(anyhow::anyhow!("noop")))
+        }
+        fn matches(&self, _: &str, _: &str) -> bool {
+            false
+        }
+        async fn segments_for(&self, _: &str) -> AppResult<Vec<yoube_filter::Segment>> {
+            Err(crate::error::AppError::Internal(anyhow::anyhow!("noop")))
+        }
+        async fn branding_for(&self, _: &str) -> AppResult<yoube_filter::Branding> {
+            Err(crate::error::AppError::Internal(anyhow::anyhow!("noop")))
+        }
+    }
+
     #[test]
     fn new_context_pings() {
         let ctx = AppContext::new(
             Arc::new(NoopYoutubeService),
             Arc::new(NoopAccountService),
             Arc::new(NoopDownloaderService),
+            Arc::new(NoopFilterService),
         );
         assert_eq!(ctx.ping().unwrap(), "pong");
     }

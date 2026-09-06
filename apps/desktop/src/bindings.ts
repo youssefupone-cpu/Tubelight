@@ -286,3 +286,50 @@ export function download_cancel(_id: number): Promise<void> {
 export function download_list(): Promise<Job[]> {
 	return Promise.resolve([]);
 }
+
+// --- FilterService contracts (Task 4.2) ---
+// Hand-stubbed mirroring crates/yoube-core/src/services/filter.rs +
+// yoube-filter/src/model.rs. Replaced by tauri-specta typegen on machines
+// with the GTK stack.
+
+export type SegmentCategory =
+	| "sponsor"
+	| "intro"
+	| "outro"
+	| "selfpromo"
+	| "preview"
+	| "music_offtopic"
+	| "filler"
+	| "interaction"
+	| "poi_highlight";
+
+export interface Segment {
+	category: SegmentCategory;
+	start_s: number;
+	end_s: number;
+	uuid: string;
+}
+
+export interface Branding {
+	title: string | null;
+	thumbnail_url: string | null;
+}
+
+export function filter_init(): Promise<number> {
+	return Promise.resolve(0);
+}
+
+export function filter_matches(
+	_url: string,
+	_source_url: string,
+): Promise<boolean> {
+	return Promise.resolve(false);
+}
+
+export function filter_segments_for(_video_id: string): Promise<Segment[]> {
+	return Promise.resolve([]);
+}
+
+export function filter_branding_for(_video_id: string): Promise<Branding> {
+	return Promise.resolve({ title: null, thumbnail_url: null });
+}

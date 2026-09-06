@@ -17,13 +17,42 @@ use yoube_error::{AppError, AppResult};
 pub struct YtDlp {
     pub bin: PathBuf,
     pub runner: Arc<dyn CommandRunner>,
+    blocker: Option<Arc<dyn UrlBlocker>>,
+}
+
+/// L2 content gate (spec §7): implemented by `yoube-core::FilterService` via
+/// an adapter. Lives here (not in `yoube-core`) so the crate graph stays a
+/// DAG — `yoube-yt-dlp` never depends on `yoube-core`.
+pub trait UrlBlocker: Send + Sync {
+    /// Return `true` if `url` must not be fetched.
+    fn is_blocked(&self, url: &str) -> bool;
 }
 
 impl YtDlp {
     pub fn new(bin: PathBuf, runner: Arc<dyn CommandRunner>) -> Self {
-        Self { bin, runner }
+        Self {
+            bin,
+            runner,
+            blocker: None,
+        }
+    }
+
+    /// Attach an L2 blocker; chaining-friendly (consumes + returns `Self`).
+    pub fn with_blocker(mut self, blocker: Arc<dyn UrlBlocker>) -> Self {
+        self.blocker = Some(blocker);
+        self
+    }
+
+    pub(crate) fn check_blocked(&self, url: &str) -> AppResult<()> {
+        if let Some(b) = &self.blocker
+            && b.is_blocked(url)
+        {
+            return Err(AppError::Blocked(url.to_string()));
+        }
+        Ok(())
     }
     pub async fn dump_json_full(&self, url: &str) -> AppResult<Value> {
+        self.check_blocked(url)?;
         let args = [
             "--skip-download",
             "--dump-single-json",

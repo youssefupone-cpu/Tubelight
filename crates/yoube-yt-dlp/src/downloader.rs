@@ -200,7 +200,12 @@ impl Downloader {
     }
 
     /// Queue a download. Returns the assigned `JobId`.
+    ///
+    /// L2 gate: the watch URL is checked against the `YtDlp` handle's
+    /// blocker (if any) before queueing.
     pub fn enqueue(&self, video_id: &str, format_id: &str, dest_dir: &Path) -> AppResult<JobId> {
+        let url = format!("https://www.youtube.com/watch?v={video_id}");
+        self.ytdlp.check_blocked(&url)?;
         let id = self.next_id.fetch_add(1, Ordering::Relaxed);
         let job = Job {
             id,

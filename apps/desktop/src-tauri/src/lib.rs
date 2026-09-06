@@ -3,6 +3,7 @@ use std::sync::Arc;
 use yoube_core::AppContext;
 use yoube_core::services::account::StorageAccountService;
 use yoube_core::services::downloader::YtDlpDownloaderService;
+use yoube_core::services::filter::AppFilterService;
 use yoube_core::services::youtube::YtDlpYoutubeService;
 use yoube_storage::Storage;
 use yoube_yt_dlp::runner::TokioCommandRunner;
@@ -20,8 +21,18 @@ fn ping(ctx: tauri::State<'_, AppContext>) -> Result<String, yoube_core::AppErro
 pub fn run() {
     tauri::Builder::default()
         .setup(|app| {
+            // L3/L2 filter service first: its cache lives under the same
+            // data dir as the DB, and the L2 gate wraps the shared yt-dlp
+            // handle below so every metadata/download call is screened.
+            let data_dir = app.path().data_dir().join("yoube");
+            std::fs::create_dir_all(&data_dir)?;
+            let filter: std::sync::Arc<AppFilterService> = std::sync::Arc::new(
+                AppFilterService::new(data_dir.join("cache"))?,
+            );
+
             let bin = crate::sidecar::yt_dlp_path(app.handle());
-            let ytdlp = YtDlp::new(bin, Arc::new(TokioCommandRunner));
+            let ytdlp = YtDlp::new(bin, Arc::new(TokioCommandRunner))
+                .with_blocker(filter.clone() as std::sync::Arc<dyn yoube_yt_dlp::UrlBlocker>);
             let youtube = Arc::new(YtDlpYoutubeService {
                 ytdlp: ytdlp.clone(),
             });
@@ -32,8 +43,6 @@ pub fn run() {
             // `setup` is synchronous, so drive the async storage init with the
             // Tauri async runtime (`block_on`); `Storage::open` itself is fast
             // (pool creation, no I/O beyond file creation).
-            let data_dir = app.path().data_dir().join("yoube");
-            std::fs::create_dir_all(&data_dir)?;
             let db_path = data_dir.join("yoube.db");
             let storage = tauri::async_runtime::block_on(async {
                 let s = Storage::open(&db_path).await?;
@@ -42,7 +51,7 @@ pub fn run() {
             })?;
             let account = Arc::new(StorageAccountService::new(storage));
 
-            let ctx = AppContext::new(youtube, account, downloader);
+            let ctx = AppContext::new(youtube, account, downloader, filter);
             app.manage(ctx);
             Ok(())
         })
@@ -76,7 +85,11 @@ pub fn run() {
             commands::download_pause,
             commands::download_resume,
             commands::download_cancel,
-            commands::download_list
+            commands::download_list,
+            commands::filter_init,
+            commands::filter_matches,
+            commands::filter_segments_for,
+            commands::filter_branding_for
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

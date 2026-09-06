@@ -20,6 +20,8 @@ pub enum AppError {
     Db(#[from] sqlx::Error),
     #[error("yt-dlp error: {0}")]
     YtDlp(String),
+    #[error("blocked by filter: {0}")]
+    Blocked(String),
     #[error("not found: {0}")]
     NotFound(String),
     #[error("internal: {0}")]

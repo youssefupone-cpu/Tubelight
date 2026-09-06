@@ -5420,7 +5420,9 @@ dependencies = [
  "serde_json",
  "tauri",
  "tauri-build",
+ "tokio",
  "yoube-core",
+ "yoube-filter",
  "yoube-yt-dlp",
 ]
 

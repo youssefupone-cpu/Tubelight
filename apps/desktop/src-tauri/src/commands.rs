@@ -189,3 +189,44 @@ pub async fn download_list(
 ) -> Result<Vec<yoube_yt_dlp::downloader::Job>, AppError> {
     ctx.downloader.list_jobs().await
 }
+
+#[tauri::command]
+// #[specta::specta]
+pub async fn filter_init(ctx: State<'_, AppContext>) -> Result<usize, AppError> {
+    ctx.filter.init().await
+}
+
+#[tauri::command]
+// #[specta::specta]
+pub async fn filter_matches(
+    ctx: State<'_, AppContext>,
+    url: String,
+    source_url: String,
+) -> Result<bool, AppError> {
+    // `matches` is sync and may block its worker briefly; keep it off the
+    // async runtime with `spawn_blocking`.
+    let filter = ctx.filter.clone();
+    Ok(
+        tokio::task::spawn_blocking(move || filter.matches(&url, &source_url))
+            .await
+            .map_err(|e| AppError::Internal(e.into()))?,
+    )
+}
+
+#[tauri::command]
+// #[specta::specta]
+pub async fn filter_segments_for(
+    ctx: State<'_, AppContext>,
+    video_id: String,
+) -> Result<Vec<yoube_filter::Segment>, AppError> {
+    ctx.filter.segments_for(&video_id).await
+}
+
+#[tauri::command]
+// #[specta::specta]
+pub async fn filter_branding_for(
+    ctx: State<'_, AppContext>,
+    video_id: String,
+) -> Result<yoube_filter::Branding, AppError> {
+    ctx.filter.branding_for(&video_id).await
+}
