@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>yoube — UI redesign v2</title>
+<style>
+  :root {
+    --bg: #0a0a0b;
+    --surface: #141417;
+    --surface-2: #1c1c21;
+    --border: #26262c;
+    --text: #f4f4f5;
+    --muted: #a1a1aa;
+    --faint: #63636b;
+    --accent: #e62117;
+    --accent-hover: #f03428;
+    --radius: 12px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    padding: 32px;
+  }
+  .page-title { font-size: 28px; font-weight: 700; margin: 48px 0 8px; }
+  .page-sub { color: var(--muted); font-size: 14px; margin-bottom: 24px; }
+  .tokens { display: flex; gap: 12px; margin: 16px 0 8px; flex-wrap: wrap; }
+  .swatch {
+    width: 120px; border-radius: 10px; overflow: hidden;
+    border: 1px solid var(--border); font-size: 11px;
+  }
+  .swatch div:first-child { height: 56px; }
+  .swatch div:last-child { padding: 6px 8px; background: var(--surface); color: var(--muted); }
+  /* ---- App shell ---- */
+  .shell {
+    width: 1280px; border: 1px solid var(--border); border-radius: 16px;
+    overflow: hidden; background: var(--bg);
+  }
+  .topbar {
+    height: 56px; display: flex; align-items: center; gap: 16px;
+    padding: 0 16px; border-bottom: 1px solid var(--border);
+    background: rgba(10, 10, 11, 0.9);
+  }
+  .logo { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 17px; }
+  .logo-mark {
+    width: 26px; height: 26px; border-radius: 8px; background: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; color: #fff;
+  }
+  .search {
+    flex: 1; max-width: 560px; margin: 0 auto; display: flex; align-items: center;
+    gap: 8px; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 999px; padding: 8px 16px; color: var(--faint); font-size: 14px;
+  }
+  .top-actions { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+  .icon-btn {
+    width: 36px; height: 36px; border-radius: 999px; display: flex;
+    align-items: center; justify-content: center; color: var(--muted);
+    border: 1px solid transparent; font-size: 15px;
+  }
+  .icon-btn.active { background: var(--surface-2); color: var(--text); border-color: var(--border); }
+  .avatar {
+    width: 32px; height: 32px; border-radius: 999px; background: #3f3f46;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 600;
+  }
+  /* ---- Home grid ---- */
+  .home { padding: 20px 24px 28px; }
+  .section-row { display: flex; align-items: baseline; gap: 12px; margin-bottom: 14px; }
+  .section-row h2 { font-size: 18px; font-weight: 700; }
+  .section-row span { font-size: 12px; color: var(--faint); }
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .card { display: flex; flex-direction: column; gap: 0; }
+  .thumb {
+    aspect-ratio: 16 / 9; border-radius: var(--radius); position: relative;
+    overflow: hidden; border: 1px solid var(--border);
+  }
+  .t1 { background: linear-gradient(135deg, #7c2d12, #431407); }
+  .t2 { background: linear-gradient(135deg, #0c4a6e, #082f49); }
+  .t3 { background: linear-gradient(135deg, #3b0764, #134e4a); }
+  .t4 { background: linear-gradient(135deg, #500f28, #7c2d12); }
+  .badge {
+    position: absolute; right: 8px; bottom: 8px; background: rgba(0,0,0,0.85);
+    font-size: 12px; font-weight: 500; padding: 2px 6px; border-radius: 6px;
+  }
+  .skips {
+    position: absolute; left: 8px; top: 8px; background: rgba(0,0,0,0.7);
+    font-size: 11px; padding: 2px 8px; border-radius: 999px; color: #d4d4d8;
+    border: 1px solid rgba(255,255,255,0.15);
+  }
+  .card-body { display: flex; gap: 10px; padding-top: 10px; }
+  .chan {
+    width: 34px; height: 34px; border-radius: 999px; flex-shrink: 0;
+    background: #3f3f46; display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 600;
+  }
+  .card-title { font-size: 14px; font-weight: 600; line-height: 1.35; }
+  .card-meta { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  /* ---- Watch ---- */
+  .watch { display: grid; grid-template-columns: 1fr 360px; gap: 24px; padding: 20px 24px 28px; }
+  .player {
+    aspect-ratio: 16 / 9; border-radius: var(--radius); background: #000;
+    border: 1px solid var(--border); display: flex; align-items: center;
+    justify-content: center; font-size: 40px; color: #52525b;
+  }
+  .watch-title { font-size: 20px; font-weight: 700; margin-top: 14px; }
+  .watch-row { display: flex; align-items: center; gap: 12px; margin-top: 10px; }
+  .chan-lg {
+    width: 40px; height: 40px; border-radius: 999px; background: #3f3f46;
+    display: flex; align-items: center; justify-content: center; font-weight: 600;
+  }
+  .sub-btn {
+    background: var(--text); color: #000; font-size: 13px; font-weight: 600;
+    border-radius: 999px; padding: 8px 16px; margin-left: 8px;
+  }
+  .pill-actions { display: flex; gap: 8px; margin-left: auto; }
+  .pill {
+    background: var(--surface-2); border: 1px solid var(--border); font-size: 13px;
+    border-radius: 999px; padding: 8px 14px; color: var(--text);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .pill.liked { color: #f87171; }
+  .dl-btn {
+    background: var(--accent); color: #fff; font-size: 13px; font-weight: 600;
+    border-radius: 999px; padding: 8px 16px;
+  }
+  .rel-card { display: flex; gap: 10px; margin-bottom: 14px; }
+  .rel-thumb {
+    width: 168px; aspect-ratio: 16/9; border-radius: 8px; flex-shrink: 0;
+    border: 1px solid var(--border); position: relative;
+  }
+  .rel-title { font-size: 13px; font-weight: 600; line-height: 1.35; }
+  .rel-meta { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  /* ---- Skeletons / empty ---- */
+  .skel-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .skel-thumb {
+    aspect-ratio: 16/9; border-radius: var(--radius); background: var(--surface-2);
+  }
+  .skel-line {
+    height: 12px; border-radius: 6px; background: var(--surface-2); margin-top: 10px;
+  }
+  .empty {
+    border: 1px dashed var(--border); border-radius: var(--radius);
+    padding: 48px 24px; text-align: center; color: var(--muted); font-size: 14px;
+    background: var(--surface);
+  }
+  .empty .big { font-size: 28px; margin-bottom: 12px; }
+</style>
+</head>
+<body>
+
+<h1 class="page-title">yoube — UI redesign v2</h1>
+<p class="page-sub">Design tokens, app shell, home grid, watch page, loading + empty states. Dark-first, red brand accent, 12px radius, system type.</p>
+
+<h2 class="page-title" style="font-size:20px">Tokens</h2>
+<div class="tokens">
+  <div class="swatch"><div style="background:#0a0a0b"></div><div>bg · #0A0A0B</div></div>
+  <div class="swatch"><div style="background:#141417"></div><div>surface · #141417</div></div>
+  <div class="swatch"><div style="background:#1c1c21"></div><div>surface-2 · #1C1C21</div></div>
+  <div class="swatch"><div style="background:#26262c"></div><div>border · #26262C</div></div>
+  <div class="swatch"><div style="background:#f4f4f5"></div><div>text · #F4F4F5</div></div>
+  <div class="swatch"><div style="background:#a1a1aa"></div><div>muted · #A1A1AA</div></div>
+  <div class="swatch"><div style="background:#e62117"></div><div>accent · #E62117</div></div>
+</div>
+
+<h2 class="page-title" style="font-size:20px">App shell + Home</h2>
+<div class="shell">
+  <div class="topbar">
+    <div class="logo"><div class="logo-mark">▶</div>yoube</div>
+    <div class="search">⌕&nbsp;&nbsp;Search videos, channels…</div>
+    <div class="top-actions">
+      <div class="icon-btn">⭳</div>
+      <div class="icon-btn">⚙</div>
+      <div class="avatar">Y</div>
+    </div>
+  </div>
+  <div class="home">
+    <div class="section-row"><h2>Trending</h2><span>United States · updated hourly</span></div>
+    <div class="grid">
+      <div class="card">
+        <div class="thumb t1"><div class="skips">3 skips</div><div class="badge">12:15</div></div>
+        <div class="card-body"><div class="chan">F</div>
+          <div><div class="card-title">100+ JavaScript Concepts you Need to Know</div>
+          <div class="card-meta">Fireship · 2.4M views · 6 months ago</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb t2"><div class="badge">18:14</div></div>
+        <div class="card-body"><div class="chan">V</div>
+          <div><div class="card-title">Why Are 96,000,000 Black Balls on This Reservoir?</div>
+          <div class="card-meta">Veritasium · 18.2M views · 6 months ago</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb t3"><div class="badge">6:08</div></div>
+        <div class="card-body"><div class="chan">K</div>
+          <div><div class="card-title">The Fermi Paradox — Where Are All The Aliens?</div>
+          <div class="card-meta">Kurzgesagt · 52.7M views · 1 year ago</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="thumb t4"><div class="badge">25:20</div></div>
+        <div class="card-body"><div class="chan">د</div>
+          <div><div class="card-title">الدحيح | الذكاء الاصطناعي هل يفكر فعلا؟</div>
+          <div class="card-meta">الدحيح · 3.1M views · 6 months ago</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h2 class="page-title" style="font-size:20px">Watch</h2>
+<div class="shell">
+  <div class="topbar">
+    <div class="logo"><div class="logo-mark">▶</div>yoube</div>
+    <div class="search">⌕&nbsp;&nbsp;Search videos, channels…</div>
+    <div class="top-actions">
+      <div class="icon-btn">⭳</div>
+      <div class="icon-btn">⚙</div>
+      <div class="avatar">Y</div>
+    </div>
+  </div>
+  <div class="watch">
+    <div>
+      <div class="player">▶</div>
+      <div class="watch-title">100+ JavaScript Concepts you Need to Know</div>
+      <div class="watch-row">
+        <div class="chan-lg">F</div>
+        <div><div style="font-weight:600;font-size:14px">Fireship</div>
+        <div style="font-size:12px;color:#a1a1aa">3.1M subscribers</div></div>
+        <div class="sub-btn">Subscribe</div>
+        <div class="pill-actions">
+          <div class="pill liked">♥ 48K</div>
+          <div class="pill">＋ Save</div>
+          <div class="dl-btn">⭳ Download</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="section-row"><h2 style="font-size:15px">Related</h2></div>
+      <div class="rel-card">
+        <div class="rel-thumb t2"><div class="badge">18:14</div></div>
+        <div><div class="rel-title">Why Are 96,000,000 Black Balls on This Reservoir?</div>
+        <div class="rel-meta">Veritasium · 18.2M views</div></div>
+      </div>
+      <div class="rel-card">
+        <div class="rel-thumb t3"><div class="badge">6:08</div></div>
+        <div><div class="rel-title">The Fermi Paradox — Where Are All The Aliens?</div>
+        <div class="rel-meta">Kurzgesagt · 52.7M views</div></div>
+      </div>
+      <div class="rel-card">
+        <div class="rel-thumb t1"><div class="badge">12:15</div></div>
+        <div><div class="rel-title">How Rust Ate JavaScript — Documentary</div>
+        <div class="rel-meta">Fireship · 980K views</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h2 class="page-title" style="font-size:20px">Loading + Empty states</h2>
+<div class="shell">
+  <div class="topbar">
+    <div class="logo"><div class="logo-mark">▶</div>yoube</div>
+    <div class="search">⌕&nbsp;&nbsp;Search videos, channels…</div>
+    <div class="top-actions"><div class="avatar">Y</div></div>
+  </div>
+  <div class="home">
+    <div class="section-row"><h2>Loading</h2><span>skeleton shimmer</span></div>
+    <div class="skel-grid">
+      <div><div class="skel-thumb"></div><div class="skel-line" style="width:90%"></div><div class="skel-line" style="width:60%"></div></div>
+      <div><div class="skel-thumb"></div><div class="skel-line" style="width:85%"></div><div class="skel-line" style="width:55%"></div></div>
+      <div><div class="skel-thumb"></div><div class="skel-line" style="width:92%"></div><div class="skel-line" style="width:62%"></div></div>
+      <div><div class="skel-thumb"></div><div class="skel-line" style="width:88%"></div><div class="skel-line" style="width:58%"></div></div>
+    </div>
+    <div class="section-row" style="margin-top:28px"><h2>Empty</h2><span>no results / no downloads</span></div>
+    <div class="empty"><div class="big">∅</div>Nothing here yet.<br />Videos you save will show up in this space.</div>
+  </div>
+</div>
+
+</body>
+</html>
