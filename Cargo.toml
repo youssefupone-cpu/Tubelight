@@ -25,7 +25,7 @@ reqwest = { version = "0.12", default-features = false, features = ["rustls-tls"
 sqlx = { version = "0.9", default-features = false, features = ["runtime-tokio", "sqlite", "macros", "migrate"] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
-adblock = "0.9"
+adblock = "0.13"
 dashmap = "6"
 directories = "5"
 chrono = { version = "0.4", features = ["serde"] }
