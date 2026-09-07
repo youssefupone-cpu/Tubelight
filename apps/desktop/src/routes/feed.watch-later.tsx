@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { playlists, playlist_items } from "@yoube/contracts";
+import { playlist_items, playlists } from "@yoube/contracts";
 import { VideoGrid } from "../components/VideoGrid";
 
 export const Route = createFileRoute("/feed/watch-later")({
@@ -19,7 +19,9 @@ export function WatchLaterFeed() {
 		enabled: !!wlId,
 	});
 
-	if (pl.isPending || items.isPending) return <div className="p-4">Loading…</div>;
-	if (pl.error) return <div className="p-4 text-red-400">{String(pl.error)}</div>;
+	if (pl.isPending || items.isPending)
+		return <div className="p-4">Loading…</div>;
+	if (pl.error)
+		return <div className="p-4 text-red-400">{String(pl.error)}</div>;
 	return <VideoGrid items={items.data ?? []} />;
 }

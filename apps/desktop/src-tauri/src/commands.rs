@@ -266,11 +266,9 @@ pub async fn filter_matches(
     // `matches` is sync and may block its worker briefly; keep it off the
     // async runtime with `spawn_blocking`.
     let filter = ctx.filter.clone();
-    Ok(
-        tokio::task::spawn_blocking(move || filter.matches(&url, &source_url))
-            .await
-            .map_err(|e| AppError::Internal(e.into()))?,
-    )
+    tokio::task::spawn_blocking(move || filter.matches(&url, &source_url))
+        .await
+        .map_err(|e| AppError::Internal(e.into()))
 }
 
 #[tauri::command]

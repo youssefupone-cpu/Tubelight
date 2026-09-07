@@ -1,6 +1,6 @@
-import { useQuery, useQueries } from "@tanstack/react-query";
+import { useQueries, useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { subscriptions, channel_videos } from "@yoube/contracts";
+import { channel_videos, subscriptions } from "@yoube/contracts";
 import type { VideoSummary } from "@yoube/contracts";
 import { VideoGrid } from "../components/VideoGrid";
 
@@ -30,6 +30,7 @@ export function SubscriptionsFeed() {
 		});
 
 	if (subs.isPending) return <div className="p-4">Loading…</div>;
-	if (subs.error) return <div className="p-4 text-red-400">{String(subs.error)}</div>;
+	if (subs.error)
+		return <div className="p-4 text-red-400">{String(subs.error)}</div>;
 	return <VideoGrid items={allVideos} />;
 }

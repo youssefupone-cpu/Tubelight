@@ -10,34 +10,37 @@
 // environments without those libs, the committed src/bindings.ts stub is used instead (see its
 // header) and this script exits cleanly without failing the workspace.
 import { spawn } from "node:child_process";
-import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const desktopDir = resolve(__dirname, "..");
 const timeoutMs = Number(process.env.GEN_CONTRACTS_TIMEOUT_MS ?? 25_000);
 
 const child = spawn("pnpm", ["exec", "tauri", "dev"], {
-  cwd: desktopDir,
-  stdio: "inherit",
-  shell: process.platform === "win32",
+	cwd: desktopDir,
+	stdio: "inherit",
+	shell: process.platform === "win32",
 });
 
 const timer = setTimeout(() => {
-  child.kill("SIGTERM");
+	child.kill("SIGTERM");
 }, timeoutMs);
 
 child.on("error", (err) => {
-  clearTimeout(timer);
-  console.error("[gen-contracts] failed to spawn tauri:", err.message);
-  process.exit(0);
+	clearTimeout(timer);
+	console.error("[gen-contracts] failed to spawn tauri:", err.message);
+	process.exit(0);
 });
 
 child.on("exit", (code, signal) => {
-  clearTimeout(timer);
-  const msg = signal === "SIGTERM" ? "timeout-reached (bindings exported on startup)" : `exit ${code}`;
-  console.log(`[gen-contracts] tauri dev stopped: ${msg}`);
-  process.exit(0);
+	clearTimeout(timer);
+	const msg =
+		signal === "SIGTERM"
+			? "timeout-reached (bindings exported on startup)"
+			: `exit ${code}`;
+	console.log(`[gen-contracts] tauri dev stopped: ${msg}`);
+	process.exit(0);
 });
 
 process.on("SIGINT", () => child.kill("SIGTERM"));

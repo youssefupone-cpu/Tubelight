@@ -8,8 +8,8 @@ import {
 	dns_uninstall,
 	filter_init,
 } from "@yoube/contracts";
-import { useState } from "react";
 import { Check, Copy, ExternalLink, RefreshCw } from "lucide-react";
+import { useState } from "react";
 import { DEFAULT_SKIP_CATEGORIES, useSetting } from "../hooks/useSettings";
 import {
 	APP_NAME,
