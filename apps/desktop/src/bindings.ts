@@ -11,18 +11,26 @@
 import {
 	MOCK_BRANDING,
 	MOCK_HISTORY,
-	MOCK_JOBS,
-	MOCK_PLAYLISTS,
 	MOCK_SEGMENTS,
-	MOCK_SUBSCRIPTIONS,
 	MOCK_USER,
 	MOCK_VIDEOS,
+	addSubscription,
+	cancelJob,
+	enqueueJob,
+	getSubscriptions,
+	listJobs,
 	mockChannel,
 	mockPlaylist,
 	mockPlaylistItems,
+	mockPlaylists,
 	mockVideo,
 	mockVideosForChannel,
+	pauseJob,
+	removeSubscription,
+	resumeJob,
 	searchMocks,
+	setLiked,
+	setWatchLater,
 } from "./mocks/data";
 
 export type AppError = string;
@@ -184,23 +192,25 @@ export function delete_user(_id: number): Promise<void> {
 }
 
 export function subscriptions(): Promise<ChannelRef[]> {
-	return Promise.resolve(MOCK_SUBSCRIPTIONS);
+	return Promise.resolve(getSubscriptions());
 }
 
 export function subscribe(
-	_channel_id: string,
-	_title: string,
-	_thumb_url?: string | null,
+	channel_id: string,
+	title: string,
+	thumb_url?: string | null,
 ): Promise<void> {
+	addSubscription(channel_id, title, thumb_url);
 	return Promise.resolve();
 }
 
-export function unsubscribe(_channel_id: string): Promise<void> {
+export function unsubscribe(channel_id: string): Promise<void> {
+	removeSubscription(channel_id);
 	return Promise.resolve();
 }
 
 export function playlists(): Promise<AccountPlaylist[]> {
-	return Promise.resolve(MOCK_PLAYLISTS);
+	return Promise.resolve(mockPlaylists());
 }
 
 export function playlist_items(id: number): Promise<VideoSummary[]> {
@@ -211,7 +221,12 @@ export function playlist_add(_id: number, _video: VideoSummary): Promise<void> {
 	return Promise.resolve();
 }
 
-export function playlist_remove(_id: number, _video_id: string): Promise<void> {
+export function playlist_remove(id: number, video_id: string): Promise<void> {
+	const v = MOCK_VIDEOS.find((m) => m.id === video_id);
+	if (v) {
+		if (id === 1) setLiked(v, false);
+		if (id === 2) setWatchLater(v, false);
+	}
 	return Promise.resolve();
 }
 
@@ -223,15 +238,19 @@ export function history_clear(): Promise<void> {
 	return Promise.resolve();
 }
 
-export function like(_video: VideoSummary): Promise<void> {
+export function like(video: VideoSummary): Promise<void> {
+	setLiked(video, true);
 	return Promise.resolve();
 }
 
-export function unlike(_video_id: string): Promise<void> {
+export function unlike(video_id: string): Promise<void> {
+	const v = MOCK_VIDEOS.find((m) => m.id === video_id);
+	if (v) setLiked(v, false);
 	return Promise.resolve();
 }
 
-export function watch_later(_video: VideoSummary): Promise<void> {
+export function watch_later(video: VideoSummary): Promise<void> {
+	setWatchLater(video, true);
 	return Promise.resolve();
 }
 
@@ -284,28 +303,29 @@ export function list_formats(video_id: string): Promise<Format[]> {
 
 export function download_enqueue(
 	video_id: string,
-	_format_id: string,
-	_dest_dir: string,
+	format_id: string,
+	dest_dir: string,
 ): Promise<number> {
-	return Promise.resolve(
-		[...video_id].reduce((a, c) => a + c.charCodeAt(0), 0) % 100000,
-	);
+	return Promise.resolve(enqueueJob(video_id, format_id, dest_dir));
 }
 
-export function download_pause(_id: number): Promise<void> {
+export function download_pause(id: number): Promise<void> {
+	pauseJob(id);
 	return Promise.resolve();
 }
 
-export function download_resume(_id: number): Promise<void> {
+export function download_resume(id: number): Promise<void> {
+	resumeJob(id);
 	return Promise.resolve();
 }
 
-export function download_cancel(_id: number): Promise<void> {
+export function download_cancel(id: number): Promise<void> {
+	cancelJob(id);
 	return Promise.resolve();
 }
 
 export function download_list(): Promise<Job[]> {
-	return Promise.resolve(MOCK_JOBS);
+	return Promise.resolve(listJobs());
 }
 
 // --- FilterService contracts (Task 4.2) ---

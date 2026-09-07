@@ -148,6 +148,86 @@ export const MOCK_VIDEOS: VideoSummary[] = [
 		upload_date: "20260318",
 		thumbnail_url: thumb("yoube-rust"),
 	},
+	{
+		id: "aQK1Fz8mLp2",
+		title: "Docker in 100 Seconds",
+		channel_id: "UCsBjURrPoezykLs9EqgamOA",
+		channel_title: "Fireship",
+		duration_s: 195,
+		view_count: 3_300_000,
+		upload_date: "20260211",
+		thumbnail_url: thumb("yoube-docker"),
+	},
+	{
+		id: "bR2Gx9nQw41",
+		title: "The Math That Keeps You Alive — Veritasium",
+		channel_id: "UCHnyfMqiRRG1u-2MsSQLbXA",
+		channel_title: "Veritasium",
+		duration_s: 1420,
+		view_count: 7_800_000,
+		upload_date: "20251209",
+		thumbnail_url: thumb("yoube-mathalive"),
+	},
+	{
+		id: "cS3Hy0oRx52",
+		title: "String Theory, Finally Explained",
+		channel_id: "UCsXVk37bltHxD1rDPwtNM8Q",
+		channel_title: "Kurzgesagt – In a Nutshell",
+		duration_s: 812,
+		view_count: 29_500_000,
+		upload_date: "20251103",
+		thumbnail_url: thumb("yoube-strings"),
+	},
+	{
+		id: "dT4Iz1pSy63",
+		title: "Fractals are Everywhere — 3Blue1Brown",
+		channel_id: "UCYO_jab_esuFRV4b17AJt6A",
+		channel_title: "3Blue1Brown",
+		duration_s: 1045,
+		view_count: 9_100_000,
+		upload_date: "20250917",
+		thumbnail_url: thumb("yoube-fractals"),
+	},
+	{
+		id: "eU5Ja2qTz74",
+		title: "I Tested Every Cheap SSD So You Don't Have To",
+		channel_id: "UCXuqSBlHAE6Xw-yeJA0Tunw",
+		channel_title: "Linus Tech Tips",
+		duration_s: 1330,
+		view_count: 2_200_000,
+		upload_date: "20260320",
+		thumbnail_url: thumb("yoube-ssd"),
+	},
+	{
+		id: "fV6Kb3rU085",
+		title: "الدحيح | هل نحن وحدنا في الكون؟",
+		channel_id: "UC7Eh8zHwPUmD8Q5dC2Qh6TA",
+		channel_title: "الدحيح",
+		duration_s: 1680,
+		view_count: 5_400_000,
+		upload_date: "20260222",
+		thumbnail_url: thumb("yoube-daheeh2"),
+	},
+	{
+		id: "gW7Lc4sV196",
+		title: "You Need a Home Lab Right Now",
+		channel_id: "UC3sKbA2JIx7cW9g0xYzQw2AB",
+		channel_title: "NetworkChuck",
+		duration_s: 975,
+		view_count: 1_100_000,
+		upload_date: "20260310",
+		thumbnail_url: thumb("yoube-homelab"),
+	},
+	{
+		id: "hX8Md5tW207",
+		title: "Python in 100 Seconds",
+		channel_id: "UCsBjURrPoezykLs9EqgamOA",
+		channel_title: "Fireship",
+		duration_s: 168,
+		view_count: 4_600_000,
+		upload_date: "20250128",
+		thumbnail_url: thumb("yoube-python"),
+	},
 ];
 
 export const MOCK_CHANNELS: Record<string, Channel> = {
@@ -198,6 +278,18 @@ export function mockVideo(id: string): Video {
 	const summary = MOCK_VIDEOS.find((v) => v.id === id) ?? MOCK_VIDEOS[0];
 	const formats: Format[] = [
 		{
+			format_id: "37",
+			ext: "mp4",
+			url: "/mock/sample.mp4",
+			resolution: "1920x1080",
+			fps: 30,
+			vcodec: "avc1.640028",
+			acodec: "mp4a.40.2",
+			filesize: 96_300_000,
+			tbr: 3800,
+			note: "1080p",
+		},
+		{
 			format_id: "22",
 			ext: "mp4",
 			url: "/mock/sample.mp4",
@@ -208,6 +300,18 @@ export function mockVideo(id: string): Video {
 			filesize: 45_447_700,
 			tbr: 1800,
 			note: "720p",
+		},
+		{
+			format_id: "136",
+			ext: "mp4",
+			url: "/mock/sample2.mp4",
+			resolution: "1280x720",
+			fps: 60,
+			vcodec: "avc1.640020",
+			acodec: "none",
+			filesize: 61_000_000,
+			tbr: 2400,
+			note: "720p60",
 		},
 		{
 			format_id: "18",
@@ -305,12 +409,8 @@ export const MOCK_PLAYLISTS: AccountPlaylist[] = [
 	},
 ];
 
-export function mockPlaylistItems(id: number): VideoSummary[] {
-	if (id === 1) return MOCK_VIDEOS.slice(0, 4);
-	if (id === 2) return MOCK_VIDEOS.slice(4, 6);
-	if (id === 3) return MOCK_VIDEOS.slice(0, 5);
-	return [];
-}
+// NOTE: mockPlaylistItems lives in the stateful store section at the end of
+// this file (liked / watch-later derive from live sets).
 
 export const MOCK_HISTORY: HistoryEntryView[] = MOCK_VIDEOS.slice(0, 6).map(
 	(v, i) => ({
@@ -381,3 +481,179 @@ export const MOCK_BRANDING: Branding = {
 	title: "100+ JavaScript Concepts (unclickbaited)",
 	thumbnail_url: thumb("yoube-js-clean"),
 };
+
+// ---------------------------------------------------------------------------
+// Stateful preview store (browser dev only).
+//
+// The hand-stubbed bindings below delegate here so likes, subscriptions,
+// watch-later and downloads behave interactively in `pnpm dev` (the real
+// Tauri backend owns this state in production). Everything is in-memory and
+// resets on reload.
+// ---------------------------------------------------------------------------
+
+const LIKED_SEED = MOCK_VIDEOS.slice(0, 4).map((v) => v.id);
+const WATCH_LATER_SEED = MOCK_VIDEOS.slice(4, 6).map((v) => v.id);
+
+const likedIds = new Set<string>(LIKED_SEED);
+const watchLaterIds = new Set<string>(WATCH_LATER_SEED);
+const subStore: ChannelRef[] = MOCK_SUBSCRIPTIONS.map((s) => ({ ...s }));
+
+function inCatalogOrder(ids: Set<string>): VideoSummary[] {
+	return MOCK_VIDEOS.filter((v) => ids.has(v.id));
+}
+
+export function isLiked(id: string): boolean {
+	return likedIds.has(id);
+}
+
+export function setLiked(video: VideoSummary, on: boolean) {
+	if (on) likedIds.add(video.id);
+	else likedIds.delete(video.id);
+}
+
+export function likedVideos(): VideoSummary[] {
+	return inCatalogOrder(likedIds);
+}
+
+export function isWatchLater(id: string): boolean {
+	return watchLaterIds.has(id);
+}
+
+export function setWatchLater(video: VideoSummary, on: boolean) {
+	if (on) watchLaterIds.add(video.id);
+	else watchLaterIds.delete(video.id);
+}
+
+export function watchLaterVideos(): VideoSummary[] {
+	return inCatalogOrder(watchLaterIds);
+}
+
+export function getSubscriptions(): ChannelRef[] {
+	return subStore.map((s) => ({ ...s }));
+}
+
+export function addSubscription(
+	channel_id: string,
+	title: string,
+	thumb_url?: string | null,
+) {
+	if (!subStore.some((s) => s.id === channel_id)) {
+		subStore.push({ id: channel_id, title, thumb_url: thumb_url ?? null });
+	}
+}
+
+export function removeSubscription(channel_id: string) {
+	const i = subStore.findIndex((s) => s.id === channel_id);
+	if (i >= 0) subStore.splice(i, 1);
+}
+
+export function mockPlaylistItems(id: number): VideoSummary[] {
+	if (id === 1) return likedVideos();
+	if (id === 2) return watchLaterVideos();
+	if (id === 3) return MOCK_VIDEOS.slice(0, 5);
+	return [];
+}
+
+export function mockPlaylists(): AccountPlaylist[] {
+	return MOCK_PLAYLISTS.map((p) => ({
+		...p,
+		count:
+			p.id === 1 ? likedIds.size : p.id === 2 ? watchLaterIds.size : p.count,
+	}));
+}
+
+// --- Simulated downloader ---------------------------------------------------
+// Jobs advance on a timer (~8%/tick, 500ms) so progress bars move, complete,
+// and pause/resume/cancel all take effect in the preview.
+
+let nextJobId = 100;
+const jobStore: Job[] = MOCK_JOBS.map((j) => ({ ...j }));
+let pumpStarted = false;
+
+function pumpTick() {
+	let changed = false;
+	for (const j of jobStore) {
+		if (j.state !== "Running") continue;
+		const total = j.total_bytes ?? 45_447_700;
+		j.total_bytes = total;
+		j.progress_bytes = Math.min(
+			total,
+			j.progress_bytes + Math.ceil(total * 0.04),
+		);
+		j.eta_s =
+			j.progress_bytes >= total
+				? null
+				: Math.max(1, Math.round(((total - j.progress_bytes) / total) * 40));
+		if (j.progress_bytes >= total) {
+			j.state = "Done";
+			j.error = null;
+		}
+		changed = true;
+	}
+	if (changed && typeof window !== "undefined") {
+		window.dispatchEvent(new CustomEvent("yoube:mock-downloads-changed"));
+	}
+}
+
+function ensurePump() {
+	if (pumpStarted || typeof window === "undefined") return;
+	pumpStarted = true;
+	window.setInterval(pumpTick, 500);
+}
+
+export function listJobs(): Job[] {
+	ensurePump();
+	return jobStore.map((j) => ({ ...j }));
+}
+
+export function enqueueJob(
+	video_id: string,
+	format_id: string,
+	dest_dir: string,
+): number {
+	ensurePump();
+	const id = nextJobId++;
+	jobStore.unshift({
+		id,
+		video_id,
+		format_id,
+		dest_dir,
+		state: "Queued",
+		progress_bytes: 0,
+		total_bytes: null,
+		eta_s: null,
+		error: null,
+	});
+  // Queue drains fast in the preview: promote to Running shortly after.
+  // Guarded for non-DOM environments (vitest): the job simply stays
+  // Queued until resumeJob() is called.
+  if (typeof window !== "undefined") {
+    window.setTimeout(() => {
+      const j = jobStore.find((x) => x.id === id);
+      if (j && j.state === "Queued") j.state = "Running";
+    }, 800);
+  }
+  return id;
+}
+
+export function pauseJob(id: number) {
+	const j = jobStore.find((x) => x.id === id);
+	if (j && j.state === "Running") j.state = "Paused";
+}
+
+export function resumeJob(id: number) {
+	ensurePump();
+	const j = jobStore.find((x) => x.id === id);
+	if (j && (j.state === "Paused" || j.state === "Queued")) j.state = "Running";
+}
+
+export function cancelJob(id: number) {
+	const j = jobStore.find((x) => x.id === id);
+	if (
+		j &&
+		(j.state === "Running" || j.state === "Paused" || j.state === "Queued")
+	) {
+		j.state = "Cancelled";
+		j.error = null;
+	}
+}

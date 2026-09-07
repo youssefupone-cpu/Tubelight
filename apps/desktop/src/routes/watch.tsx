@@ -19,6 +19,7 @@ import {
 	WatchLaterBtn,
 } from "../components/VideoCard";
 import { DEFAULT_SKIP_CATEGORIES, useSetting } from "../hooks/useSettings";
+import { resolveMediaSrc } from "../lib/media";
 import { cn } from "../lib/utils";
 
 export const Route = createFileRoute("/watch")({
@@ -85,7 +86,7 @@ function Watch() {
 			<div>
 				<div className="aspect-video bg-black rounded-xl overflow-hidden border border-white/[0.06]">
 					<Player
-						src={best.url ?? ""}
+						src={resolveMediaSrc(best.url ?? "")}
 						poster={vid.data.summary.thumbnail_url ?? undefined}
 						segments={segments.data ?? []}
 						skipEnabled={l3Enabled}
