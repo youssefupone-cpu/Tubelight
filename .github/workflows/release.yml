@@ -15,7 +15,7 @@ jobs:
   build-linux:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Install Linux deps
         run: |
           sudo apt-get update
@@ -45,7 +45,7 @@ jobs:
     needs: build-linux
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: actions/setup-java@v4
         with: { distribution: temurin, java-version: "17" }
       - uses: dtolnay/rust-toolchain@stable
@@ -66,9 +66,9 @@ jobs:
           sdkmanager "ndk;26.3.11579264" "cmake;3.22.1" "platforms;android-34" "build-tools;34.0.0"
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @yoube/desktop build
-      - name: Build Android debug APK
+      - name: Build Android debug APKs (split per ABI)
         working-directory: apps/desktop
-        run: pnpm exec tauri android build --debug
+        run: pnpm exec tauri android build --debug --split-per-abi
       - name: List APKs
         run: find apps/desktop/src-tauri/gen/android/app/build/outputs/apk -name "*.apk"
       - name: Upload APKs to preview release

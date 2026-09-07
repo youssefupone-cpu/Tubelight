@@ -11,7 +11,7 @@ jobs:
       matrix: { os: [ubuntu-24.04, macos-14, windows-2022] }
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Fetch yt-dlp sidecars for this runner
         run: bash scripts/update-sidecars.sh
       - if: runner.os == 'Linux'

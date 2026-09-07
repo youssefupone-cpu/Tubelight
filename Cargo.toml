@@ -14,6 +14,13 @@ version = "0.0.1"
 edition = "2024"
 license = "MIT OR Apache-2.0"
 rust-version = "1.85"
+# Strip debuginfo from dev builds: Android debug .so files otherwise ship
+# ~200MB of dwarf data per ABI (universal APK approached 900MB).
+# Panic messages and line-level traces for workspace crates are unaffected
+# enough for preview debugging; use `strip = "none"` locally if full
+# debuginfo is ever needed.
+[profile.dev]
+strip = "debuginfo"
 [workspace.dependencies]
 tokio = { version = "1", features = ["full"] }
 serde = { version = "1", features = ["derive"] }
