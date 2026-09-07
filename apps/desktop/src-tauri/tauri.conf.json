@@ -18,6 +18,13 @@
   "bundle": {
     "active": true,
     "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
     "category": "Video",
     "shortDescription": "YouTube without the noise",
     "longDescription": "Tubelight is a private desktop client for YouTube: no ads, no trackers, sponsor skipping, downloads, and a local library. Your data never leaves your machine.",
