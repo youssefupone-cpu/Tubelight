@@ -8,6 +8,7 @@ import {
 import { current_user } from "@yoube/contracts";
 import { Download, Play, Search, Settings } from "lucide-react";
 import { useState } from "react";
+import { ReportBanner } from "../components/ReportBanner";
 import { initialOf } from "../lib/format";
 import { cn } from "../lib/utils";
 
@@ -61,7 +62,7 @@ export const Route = createRootRoute({
 					<span className="w-[26px] h-[26px] rounded-lg bg-[#e62117] flex items-center justify-center">
 						<Play size={13} className="text-white fill-white ml-px" />
 					</span>
-					yoube
+					tubelight
 				</Link>
 				<SearchBar />
 				<nav className="flex items-center gap-1 ml-auto">
@@ -94,6 +95,7 @@ export const Route = createRootRoute({
 					<UserAvatar />
 				</nav>
 			</header>
+			<ReportBanner />
 			<main className="flex-1 min-h-0">
 				<Outlet />
 			</main>

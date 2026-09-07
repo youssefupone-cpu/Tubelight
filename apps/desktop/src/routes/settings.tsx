@@ -1,14 +1,141 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, createFileRoute } from "@tanstack/react-router";
 import {
+	check_update,
 	dns_install,
 	dns_refresh,
 	dns_status,
 	dns_uninstall,
 	filter_init,
 } from "@yoube/contracts";
+import { useState } from "react";
+import { Check, Copy, ExternalLink, RefreshCw } from "lucide-react";
 import { DEFAULT_SKIP_CATEGORIES, useSetting } from "../hooks/useSettings";
+import {
+	APP_NAME,
+	APP_VERSION,
+	GITHUB_URL,
+	RELEASES_URL,
+} from "../lib/appmeta";
+import { buildIssueUrl, buildReportText } from "../lib/report";
 import { cn } from "../lib/utils";
+
+function About() {
+	const [copied, setCopied] = useState(false);
+	const [desc, setDesc] = useState("");
+	const update = useMutation({ mutationFn: check_update });
+	const report = {
+		title: "[bug] Tubelight report",
+		extra: desc.trim() || undefined,
+	};
+
+	const copy = async () => {
+		const text = buildReportText(report);
+		try {
+			await navigator.clipboard.writeText(text);
+		} catch {
+			const ta = document.createElement("textarea");
+			ta.value = text;
+			document.body.appendChild(ta);
+			ta.select();
+			document.execCommand("copy");
+			ta.remove();
+		}
+		setCopied(true);
+	};
+
+	return (
+		<div className="flex flex-col gap-4">
+			<div className="rounded-xl border border-neutral-800 bg-neutral-900 p-4 text-sm text-neutral-300">
+				<p className="font-semibold text-white">
+					{APP_NAME} {APP_VERSION}
+				</p>
+				<p className="mt-1 text-xs text-neutral-400">
+					Tauri 2 + React 19 desktop client for YouTube. Sidecars: yt-dlp +
+					ffmpeg. Block lists: EasyList, EasyPrivacy, StevenBlack hosts.
+					Segments: SponsorBlock + DeArrow.
+				</p>
+				<div className="mt-3 flex flex-wrap items-center gap-2">
+					<button
+						type="button"
+						onClick={() => update.mutate()}
+						disabled={update.isPending}
+						className="flex items-center gap-1.5 rounded-full bg-neutral-800 px-4 py-1.5 text-sm text-neutral-200 hover:bg-neutral-700 disabled:opacity-50"
+					>
+						<RefreshCw
+							size={14}
+							className={update.isPending ? "animate-spin" : undefined}
+						/>
+						{update.isPending ? "Checking…" : "Check for updates"}
+					</button>
+					<a
+						href={RELEASES_URL}
+						target="_blank"
+						rel="noopener noreferrer"
+						className="flex items-center gap-1.5 rounded-full bg-neutral-800 px-4 py-1.5 text-sm text-neutral-200 hover:bg-neutral-700"
+					>
+						<ExternalLink size={14} />
+						Releases
+					</a>
+				</div>
+				{update.data && (
+					<p className="mt-2 text-xs text-neutral-400">
+						{update.data.available && update.data.latest
+							? `Update available: v${update.data.latest} (you have v${update.data.current}). Grab it from Releases.`
+							: `You're on the latest version (v${update.data.current}).`}
+						{update.data.notes && ` — ${update.data.notes}`}
+					</p>
+				)}
+				{update.error && (
+					<p className="mt-2 text-xs text-red-400">
+						Couldn't reach the update server. Try the Releases page. (
+						{String(update.error)})
+					</p>
+				)}
+			</div>
+
+			<div className="rounded-xl border border-neutral-800 bg-neutral-900 p-4 text-sm text-neutral-300">
+				<p className="font-semibold text-white">Report a bug</p>
+				<p className="mt-1 text-xs text-neutral-400">
+					Found a crash or a wrong behavior? Describe it below, then open a
+					prefilled GitHub issue or copy the report. Bugs labeled{" "}
+					<code>bug</code> are triaged within 48 hours. Nothing is sent
+					automatically.
+				</p>
+				<textarea
+					value={desc}
+					onChange={(e) => setDesc(e.target.value)}
+					rows={3}
+					placeholder="What happened, and what did you expect?"
+					aria-label="Bug description"
+					className="mt-2 w-full rounded-lg border border-neutral-700 bg-neutral-800 px-3 py-2 text-sm outline-none placeholder:text-neutral-600 focus:border-neutral-500"
+				/>
+				<div className="mt-2 flex flex-wrap gap-2">
+					<a
+						href={buildIssueUrl(report)}
+						target="_blank"
+						rel="noopener noreferrer"
+						className="flex items-center gap-1.5 rounded-full bg-neutral-800 px-4 py-1.5 text-sm text-neutral-200 hover:bg-neutral-700"
+					>
+						<ExternalLink size={14} />
+						Open issue on GitHub
+					</a>
+					<button
+						type="button"
+						onClick={copy}
+						className="flex items-center gap-1.5 rounded-full bg-neutral-800 px-4 py-1.5 text-sm text-neutral-200 hover:bg-neutral-700"
+					>
+						{copied ? <Check size={14} /> : <Copy size={14} />}
+						{copied ? "Copied" : "Copy report"}
+					</button>
+				</div>
+				<p className="mt-2 text-xs text-neutral-500">
+					Prefer manual filing? {GITHUB_URL}/issues
+				</p>
+			</div>
+		</div>
+	);
+}
 
 export const Route = createFileRoute("/settings")({
 	validateSearch: (search) => ({
@@ -281,16 +408,7 @@ function Settings() {
 						page.
 					</div>
 				)}
-				{tab === "about" && (
-					<div className="rounded-xl border border-neutral-800 bg-neutral-900 p-4 text-sm text-neutral-300">
-						<p className="font-semibold text-white">yoube 0.0.1</p>
-						<p className="mt-1 text-xs text-neutral-400">
-							Tauri 2 + React 19 desktop client for YouTube. Sidecars: yt-dlp +
-							ffmpeg. Block lists: EasyList, EasyPrivacy, StevenBlack hosts.
-							Segments: SponsorBlock + DeArrow.
-						</p>
-					</div>
-				)}
+				{tab === "about" && <About />}
 			</div>
 		</div>
 	);

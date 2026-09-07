@@ -314,3 +314,41 @@ pub async fn dns_status(ctx: State<'_, AppContext>) -> Result<String, AppError> 
 pub async fn dns_refresh(ctx: State<'_, AppContext>) -> Result<usize, AppError> {
     ctx.dnsblock.refresh().await
 }
+
+/// Update metadata surfaced to Settings → About. `available` is false when
+/// the endpoint is unreachable or the app is current (fail-open: the user
+/// can always open the releases page instead).
+#[derive(Debug, Clone, serde::Serialize)]
+pub struct UpdateInfo {
+    pub available: bool,
+    pub current: String,
+    pub latest: Option<String>,
+    pub notes: Option<String>,
+}
+
+#[tauri::command]
+// #[specta::specta]
+pub async fn check_update(app: tauri::AppHandle) -> Result<UpdateInfo, AppError> {
+    use tauri_plugin_updater::UpdaterExt;
+    let current = app.package_info().version.to_string();
+    let found = app
+        .updater()
+        .map_err(|e| AppError::Internal(e.into()))?
+        .check()
+        .await
+        .map_err(|e| AppError::Internal(e.into()))?;
+    Ok(match found {
+        Some(u) => UpdateInfo {
+            available: true,
+            current,
+            latest: Some(u.version),
+            notes: u.body,
+        },
+        None => UpdateInfo {
+            available: false,
+            current,
+            latest: None,
+            notes: None,
+        },
+    })
+}

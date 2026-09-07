@@ -1,8 +1,8 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "yoube",
+  "productName": "Tubelight",
   "version": "0.0.1",
-  "identifier": "app.yoube.desktop",
+  "identifier": "app.tubelight.desktop",
   "build": {
     "beforeDevCommand": "pnpm dev",
     "beforeBuildCommand": "pnpm build",
@@ -10,12 +10,27 @@
     "frontendDist": "../dist"
   },
   "app": {
-    "windows": [{ "label": "main", "title": "yoube", "width": 1280, "height": 800 }],
-    "security": { "csp": null }
+    "windows": [{ "label": "main", "title": "Tubelight", "width": 1280, "height": 800 }],
+    "security": {
+      "csp": "default-src 'self'; img-src 'self' asset: https: data: blob:; media-src 'self' asset: https: blob: data:; connect-src 'self' asset: ipc: http://ipc.localhost ws://localhost:* https: blob: data:; font-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; worker-src 'self' blob:; frame-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none'"
+    }
   },
   "bundle": {
     "active": true,
     "targets": "all",
+    "category": "Video",
+    "shortDescription": "YouTube without the noise",
+    "longDescription": "Tubelight is a private desktop client for YouTube: no ads, no trackers, sponsor skipping, downloads, and a local library. Your data never leaves your machine.",
     "externalBin": ["../../sidecars/yt-dlp/yt-dlp"]
+  },
+  "plugins": {
+    "updater": {
+      "active": true,
+      "dialog": false,
+      "endpoints": [
+        "https://github.com/youssefupone-cpu/Tubelight/releases/latest/download/latest.json"
+      ],
+      "pubkey": "UPDATER_PUBKEY_PLACEHOLDER"
+    }
   }
 }

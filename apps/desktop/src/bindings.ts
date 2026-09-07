@@ -374,3 +374,23 @@ export function dns_status(): Promise<string> {
 export function dns_refresh(): Promise<number> {
 	return Promise.resolve(0);
 }
+
+// --- Updater contracts ---
+// Hand-stubbed mirroring commands::UpdateInfo. Replaced by tauri-specta
+// typegen on machines with the GTK stack.
+
+export interface UpdateInfo {
+	available: boolean;
+	current: string;
+	latest: string | null;
+	notes: string | null;
+}
+
+export function check_update(): Promise<UpdateInfo> {
+	return Promise.resolve({
+		available: false,
+		current: "0.0.1",
+		latest: null,
+		notes: null,
+	});
+}

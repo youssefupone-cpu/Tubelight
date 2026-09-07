@@ -29,7 +29,7 @@ export function Player({
 			<MediaPlayer
 				src={src}
 				poster={poster}
-				title="yoube"
+				title="tubelight"
 				crossOrigin="anonymous"
 			>
 				<MediaProvider />
