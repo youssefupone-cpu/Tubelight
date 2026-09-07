@@ -51,6 +51,9 @@ jobs:
         with: { node-version: 20, cache: pnpm }
       - name: Setup Android SDK/NDK
         uses: android-actions/setup-android@v3
+      - name: Install NDK and CMake
+        run: |
+          sdkmanager "ndk;26.3.11579264" "cmake;3.22.1" "platforms;android-34" "build-tools;34.0.0"
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @yoube/desktop build
       - name: Build Android debug APK

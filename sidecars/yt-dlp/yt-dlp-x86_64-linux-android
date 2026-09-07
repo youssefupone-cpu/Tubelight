@@ -1,0 +1,6 @@
+#!/system/bin/sh
+# Preview placeholder: yt-dlp has no official Android binaries.
+# In-app downloads are disabled on Android in this preview;
+# browsing, library, filters and DNS blocking work normally.
+echo "yt-dlp is not available in this preview build" >&2
+exit 1
