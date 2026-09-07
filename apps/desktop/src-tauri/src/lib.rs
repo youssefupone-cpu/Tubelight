@@ -1,5 +1,6 @@
 use std::sync::Arc;
 
+use tauri::Manager;
 use yoube_core::AppContext;
 use yoube_core::services::account::StorageAccountService;
 use yoube_core::services::dns::AppDnsBlockService;
@@ -33,7 +34,11 @@ pub fn run() {
             // L3/L2 filter service first: its cache lives under the same
             // data dir as the DB, and the L2 gate wraps the shared yt-dlp
             // handle below so every metadata/download call is screened.
-            let data_dir = app.path().data_dir().join("tubelight");
+            let data_dir = app
+                .path()
+                .data_dir()
+                .map_err(|e| yoube_core::AppError::Internal(e.into()))?
+                .join("tubelight");
             std::fs::create_dir_all(&data_dir)?;
             let filter: std::sync::Arc<AppFilterService> =
                 std::sync::Arc::new(AppFilterService::new(data_dir.join("cache"))?);

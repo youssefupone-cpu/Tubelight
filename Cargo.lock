@@ -5812,6 +5812,7 @@ dependencies = [
  "tokio",
  "yoube-core",
  "yoube-filter",
+ "yoube-storage",
  "yoube-yt-dlp",
 ]
 

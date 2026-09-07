@@ -21,7 +21,7 @@
     "category": "Video",
     "shortDescription": "YouTube without the noise",
     "longDescription": "Tubelight is a private desktop client for YouTube: no ads, no trackers, sponsor skipping, downloads, and a local library. Your data never leaves your machine.",
-    "externalBin": ["../../sidecars/yt-dlp/yt-dlp"]
+    "externalBin": ["../../../sidecars/yt-dlp/yt-dlp"]
   },
   "plugins": {
     "updater": {

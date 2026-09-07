@@ -8,7 +8,6 @@ pub fn yt_dlp_path(app: &tauri::AppHandle) -> PathBuf {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     #[test]
     fn triple_aware_filename() {
         // sanity: the function only takes an AppHandle in production; here we

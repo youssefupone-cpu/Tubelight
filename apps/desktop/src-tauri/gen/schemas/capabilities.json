@@ -1,0 +1,1 @@
+{"default":{"identifier":"default","description":"yoube default capabilities — least privilege: core IPC only. The yt-dlp sidecar is spawned from Rust via tokio::process (not the shell plugin), so no shell permissions are granted. Frontend never calls shell/opener APIs. See SECURITY.md.","local":true,"windows":["main"],"permissions":["core:default","updater:default"]}}
