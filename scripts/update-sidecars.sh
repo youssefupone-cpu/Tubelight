@@ -11,4 +11,6 @@ curl -L "$base/yt-dlp_linux" -o sidecars/yt-dlp/yt-dlp-x86_64-unknown-linux-gnu
 chmod +x sidecars/yt-dlp/yt-dlp-x86_64-unknown-linux-gnu
 curl -L "$base/yt-dlp_macos" -o sidecars/yt-dlp/yt-dlp-aarch64-apple-darwin
 chmod +x sidecars/yt-dlp/yt-dlp-aarch64-apple-darwin
+curl -L "$base/yt-dlp_macos" -o sidecars/yt-dlp/yt-dlp-x86_64-apple-darwin
+chmod +x sidecars/yt-dlp/yt-dlp-x86_64-apple-darwin
 curl -L "$base/yt-dlp.exe" -o sidecars/yt-dlp/yt-dlp-x86_64-pc-windows-msvc.exe

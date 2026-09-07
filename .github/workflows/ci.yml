@@ -10,6 +10,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
+      - name: Fetch yt-dlp sidecars for this runner
+        run: bash scripts/update-sidecars.sh
       - if: runner.os == 'Linux'
         run: |
           sudo apt-get update
