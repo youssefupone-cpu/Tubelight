@@ -13,19 +13,27 @@ use yoube_yt_dlp::runner::TokioCommandRunner;
 mod commands;
 mod sidecar;
 
+#[derive(Debug, Clone, serde::Serialize)]
+pub struct PingResponse {
+    pub value: String,
+}
+
 #[tauri::command]
-fn ping(ctx: tauri::State<'_, AppContext>) -> Result<String, yoube_core::AppError> {
-    Ok(ctx.ping()?.to_string())
+fn ping(ctx: tauri::State<'_, AppContext>) -> Result<PingResponse, yoube_core::AppError> {
+    Ok(PingResponse {
+        value: ctx.ping()?.to_string(),
+    })
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .setup(|app| {
             // L3/L2 filter service first: its cache lives under the same
             // data dir as the DB, and the L2 gate wraps the shared yt-dlp
             // handle below so every metadata/download call is screened.
-            let data_dir = app.path().data_dir().join("yoube");
+            let data_dir = app.path().data_dir().join("tubelight");
             std::fs::create_dir_all(&data_dir)?;
             let filter: std::sync::Arc<AppFilterService> =
                 std::sync::Arc::new(AppFilterService::new(data_dir.join("cache"))?);
@@ -42,7 +50,7 @@ pub fn run() {
             // `setup` is synchronous, so drive the async storage init with the
             // Tauri async runtime (`block_on`); `Storage::open` itself is fast
             // (pool creation, no I/O beyond file creation).
-            let db_path = data_dir.join("yoube.db");
+            let db_path = data_dir.join("tubelight.db");
             let storage = tauri::async_runtime::block_on(async {
                 let s = Storage::open(&db_path).await?;
                 s.migrate().await?;
@@ -95,7 +103,8 @@ pub fn run() {
             commands::dns_install,
             commands::dns_uninstall,
             commands::dns_status,
-            commands::dns_refresh
+            commands::dns_refresh,
+            commands::check_update
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
