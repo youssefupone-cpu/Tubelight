@@ -2,6 +2,8 @@ name: Preview Release
 on:
   push:
     tags: ["v*-preview*"]
+permissions:
+  contents: write
 
 jobs:
   # --- Linux desktop bundles (.AppImage + .deb) ---
