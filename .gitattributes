@@ -1,0 +1,14 @@
+# Enforce LF everywhere so Biome/Prettier checks are identical on all OSes
+# (Windows runners check out CRLF by default, which breaks `biome check`).
+* text=auto eol=lf
+
+# Binaries must never get line-ending conversion.
+*.png binary
+*.ico binary
+*.icns binary
+*.pdf binary
+*.AppImage binary
+*.deb binary
+*.rpm binary
+*.apk binary
+*.exe binary
